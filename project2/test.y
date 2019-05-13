@@ -1,7 +1,7 @@
 %{
 #include <iostream>
 using namespace std;
-}%
+%}
 
 %union{
     int val;
@@ -19,6 +19,9 @@ using namespace std;
 %token <dval> REAL_CONST
 %token <sval> STR_CONST
 %toekn <bval> BOOL_CONST
+
+//type declare for non-terminal symbols
+%type <type> var_type
 
 %start program
 
@@ -39,7 +42,30 @@ program:    identifier semi
             }
             ;
 
+//  type
+var_type:       INTEGER
+            |   BOOLEAN
+            |   STRING
+            |   
+            ;
 
+// Syntactic Definitions
+
+/* 
+    Constants and Variable Definitions
+*/
+
+optional_var_declaration:   
+            |   
+            ;
+
+constants:  CONST IDENTIFIER '=' expression //constant_exp
+            ;
+
+variables:      VAR IDENTIFIER ':' var_type ';'
+            |   
+            |   IDENTIFIER
+            ;
 
 statement:      IDENTIFIER EQ expression ';'
             |   IDENTIFIER '[' expression ']' EQ expression';' //integer-expression
@@ -51,12 +77,19 @@ statement:      IDENTIFIER EQ expression ';'
             |   conditional
             |   loop
             |   function_invocation
-            ；
+            ;
+
 function_invocation:    IDENTIFIER '(' expression ')' ';' //comma-separated expressopns
-            ；
+            ;
 
 conditional:    IF '(' expression ')' THEN //boolean_expre
             |   IF '(' expression ')' 
+            ;
+
+/*
+    Program Units
+*/
+
 
 expression:     IDENTIFIER
             |   '-' expression %prec UMINUS
@@ -75,7 +108,11 @@ expression:     IDENTIFIER
             |   expression OR expression
             |   IDENTIFIER '[' expression ']'   //数组 integer_expression
             |   IDENTIFIER '(' expression ')'   //comma-separed expression
-            ；
+            ;
+
+/*
+    Semantic Definition
+*/
 
 %%
 
