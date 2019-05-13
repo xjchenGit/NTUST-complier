@@ -49,10 +49,10 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 ":="	{token(":=");}
 
 "array"	{token(ARRAY);}
-"boolean"	{token(BOOLEAN);}
+"boolean"	{token(BOOLEAN);}  //
 "begin"	{token(BEGIN);}
 "break"	{token(BREAK);}
-"char"	{token(CHAR);}
+"char"	{token(CHAR);}  //
 "case"	{token(CASE);}
 "const"	{token(CONST);}
 "continue"	{token(CONTINUE);}
@@ -65,7 +65,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "fn"	{token(FN);}
 "if"	{token(IF);}
 "in"	{token(IN);}
-"integer"	{token(INTEGER);}
+"integer"	{token(INTEGER);}  //
 "loop"	{token(LOOP);}
 "module"	{token(MODULE);}
 "print"	{token(PRINT);}
