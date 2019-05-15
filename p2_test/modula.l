@@ -97,12 +97,12 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 			lookup = 1;
 			break;
 		}
-		return IDENTIFIER;
 	}
 	if(!lookup){
 		strcpy(table[table_index],yytext);
 		table_index++;
 	}
+		return IDENTIFIER;
 }
 {integer} {
 	tokenInteger("integer",atoi(yytext));

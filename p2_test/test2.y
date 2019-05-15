@@ -6,9 +6,6 @@
 using namespace std;
 int  yylex  (void);
 void yyerror(const char *s);
-//int linenum = 1;
-//char table[256][256];
-//int table_index = 0;
 %}
 
 %union{
