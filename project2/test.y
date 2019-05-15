@@ -14,7 +14,7 @@ using namespace std;
 %token AND OR EQ LE_EQ GR_EQ NEQ
 %token ARRAY BOOLEAN BEGIN BREAK CHAR CASE CONST CONTINUE DO ELSE END EXIT FALSE FOR FN IF IN INTEGER LOOP MODULE PRINT PRINTLN PROCEDURE REPEAT RETURN REAL STRING RECORD THEN TURE TYPE USE UTIL VAR WHILE
 
-%token <sval> IDENTIFIER
+%token <sval> IDENTIFIERS
 %token <val> INT_INTEGER
 %token <dval> REAL_CONST
 %token <sval> STR_CONST
@@ -36,7 +36,7 @@ using namespace std;
 %nonassoc UMINUS
 
 %%
-program:    identifier semi
+program:    IDENTIFIERS semi
             {
                 Trace("Reducing to program\n");
             }
@@ -59,19 +59,19 @@ optional_var_declaration:
             |   
             ;
 
-constants:  CONST IDENTIFIER '=' expression //constant_exp
+constants:  CONST IDENTIFIERS '=' expression //constant_exp
             ;
 
-variables:      VAR IDENTIFIER ':' var_type ';'
+variables:      VAR IDENTIFIERS ':' var_type ';'
             |   
-            |   IDENTIFIER
+            |   IDENTIFIERS
             ;
 
-statement:      IDENTIFIER EQ expression ';'
-            |   IDENTIFIER '[' expression ']' EQ expression';' //integer-expression
+statement:      IDENTIFIERS EQ expression ';'
+            |   IDENTIFIERS '[' expression ']' EQ expression';' //integer-expression
             |   PRINT expression ';'
             |   PRINTLN expression ';'
-            |   READ IDENTIFIER ';'   //要往前面加一个READ的token
+            |   READ IDENTIFIERS ';'   //要往前面加一个READ的token
             |   RETURN ';'
             |   RETURN expression ';'
             |   conditional
@@ -79,7 +79,7 @@ statement:      IDENTIFIER EQ expression ';'
             |   function_invocation
             ;
 
-function_invocation:    IDENTIFIER '(' expression ')' ';' //comma-separated expressopns
+function_invocation:    IDENTIFIERS '(' expression ')' ';' //comma-separated expressopns
             ;
 
 conditional:    IF '(' expression ')' THEN //boolean_expre
@@ -91,7 +91,7 @@ conditional:    IF '(' expression ')' THEN //boolean_expre
 */
 
 
-expression:     IDENTIFIER
+expression:     IDENTIFIERS
             |   '-' expression %prec UMINUS
             |   expression '*' expression
             |   expression '/' expression
@@ -106,8 +106,8 @@ expression:     IDENTIFIER
             |   '~' expression
             |   expression AND expression
             |   expression OR expression
-            |   IDENTIFIER '[' expression ']'   //数组 integer_expression
-            |   IDENTIFIER '(' expression ')'   //comma-separed expression
+            |   IDENTIFIERS '[' expression ']'   //数组 integer_expression
+            |   IDENTIFIERS '(' expression ')'   //comma-separed expression
             ;
 
 /*

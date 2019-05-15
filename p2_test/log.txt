@@ -1,0 +1,48 @@
+State 12 conflicts: 1 shift/reduce
+State 14 conflicts: 1 shift/reduce
+State 56 conflicts: 2 reduce/reduce
+
+State 12
+
+    6 constants: CONST optional_con_exp .
+    8 optional_con_exp: optional_con_exp . IDENTIFIERS '=' expression ';'
+
+    IDENTIFIERS  shift, and go to state 21
+
+    IDENTIFIERS  [reduce using rule 6 (constants)]
+    $default    reduce using rule 6 (constants)
+
+State 14
+
+    9 variables: VAR optional_var_exp .
+   12 optional_var_exp: optional_var_exp . IDENTIFIERS ':' data_type ';'
+
+    IDENTIFIERS  shift, and go to state 23
+
+    IDENTIFIERS  [reduce using rule 9 (variables)]
+    $default    reduce using rule 9 (variables)
+
+State 56
+
+   60 optional_statement: statement . optional_statement
+   61                   | statement .
+
+    IF          shift, and go to state 49
+    PRINT       shift, and go to state 50
+    PRINTLN     shift, and go to state 51
+    RETURN      shift, and go to state 52
+    WHILE       shift, and go to state 53
+    READ        shift, and go to state 54
+    IDENTIFIERS  shift, and go to state 55
+
+    ELSE      reduce using rule 61 (optional_statement)
+    ELSE      [reduce using rule 62 (optional_statement)]
+    END       reduce using rule 61 (optional_statement)
+    END       [reduce using rule 62 (optional_statement)]
+    $default  reduce using rule 61 (optional_statement)
+
+    statement              go to state 56
+    conditional_statement  go to state 57
+    loop_statement         go to state 58
+    optional_statement     go to state 96
+    function_invocation    go to state 60

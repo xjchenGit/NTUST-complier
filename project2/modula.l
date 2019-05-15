@@ -14,7 +14,7 @@ int table_index = 0;
 
 digits [0-9]
 letter [A-Za-z]
-identifiers [A-Za-z]([0-9]|[A-Za-z])*
+IDENTIFIERSs [A-Za-z]([0-9]|[A-Za-z])*
 integer {digits}+
 real [+-]?{integer}"\."{integer}([e][+-]{integer})?
 str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
@@ -88,7 +88,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 		LIST;
 		}
 
-{identifiers} {
+{IDENTIFIERSs} {
 	tokenString("id",yytext);
 	int lookup = 0;
 	for(int i = 0; i < table_index; i++){
@@ -102,7 +102,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 		strcpy(table[table_index],yytext);
 		table_index++;
 	}
-	return IDENTIFIERS;
+	return IDENTIFIERSS;
 }
 {integer} {
 	tokenInteger("integer",atoi(yytext));
