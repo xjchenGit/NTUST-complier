@@ -1,14 +1,14 @@
-a.out:y.tab.c lex.yy.c
-	g++ y.tab.c lex.yy.c -ll -ly
+a.out:y.tab.cpp lex.yy.cpp
+	g++ -std=c++11 -Wno-deprecated-register y.tab.cpp -o parser -ll -ly
 
-lex.yy.c:modula.l
-	flex modula.l
+lex.yy.cpp:modula.l
+	flex -o lex.yy.cpp modula.l
 
-y.tab.c:test1.y
-	bison -y -d test1.y
+y.tab.cpp:test2.y
+	yacc -y -v -d test2.y -o y.tab.cpp
 
 clean:
 	-rm -f a.out
-	-rm -f *.c
-	-rm -f *.h
-	-rm -f *.output
+	-rm -f *.cpp
+	-rm -f *.hpp
+	-rm -f parser

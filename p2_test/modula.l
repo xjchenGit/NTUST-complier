@@ -1,12 +1,15 @@
 %{
+#include <iostream>
 #include <stdio.h>
 #include <string.h>
-#include "y.tab.h"
+#include <string>
+#include "y.tab.hpp"
 #define MAX_LINE_LENG 256
 #define LIST	strcat(buf,yytext)
 #define token(t) {LIST;printf("<%s>\n",#t);}
 #define tokenInteger(t,i) {LIST;printf("<%s:%d>\n",t,i);}
 #define tokenString(t,s) {LIST;printf("<%s:%s>\n",t,s);}
+using namespace std;
 int linenum = 1;
 char buf[MAX_LINE_LENG];
 char table[256][256];
@@ -25,7 +28,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 %%
 ","	{token(',');return yytext[0];}
 ":"	{token(':');return yytext[0];}
-"\."	{token('\.');return yytext[0];}
+"."	{token('.');return yytext[0];}
 ";"	{token(';');return yytext[0];}
 "("	{token('(');return yytext[0];}
 ")"	{token(')');return yytext[0];}
@@ -50,8 +53,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 ":="	{token(':=');return EQ;}
 
 "array"	{token(ARRAY);return ARRAY;}
-"boolean"	{token(BOOLEAN);return BOOLEAN;}
-"begin"	{token(T_BEGIN);return T_BEGIN;}
+"begin"	{token(_BEGIN);return _BEGIN;}
 "break"	{token(BREAK);return BREAK;}
 "char"	{token(CHAR);return CHAR;}
 "case"	{token(CASE);return CASE;}
@@ -61,7 +63,6 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "else"	{token(ELSE);return ELSE;}
 "end"	{token(END);return END;}
 "exit"	{token(EXIT);return EXIT;}
-
 "for"	{token(FOR);return FOR;}
 "fn"	{token(FN);return FN;}
 "if"	{token(IF);return IF;}
@@ -83,8 +84,17 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "util"	{token(UTIL);return UTIL;}
 "var"	{token(VAR);return VAR;}
 "while"	{token(WHILE);return WHILE;}
-"false"	{token(FALSE);return FALSE;}
-"ture"	{token(TURE);return TURE;}
+"boolean"	{token(BOOLEAN);return BOOLEAN;}
+
+"false"	{
+	tokenString("boolean","FALSE");
+	return BOOLEAN_CONST;
+}
+
+"ture"	{
+	tokenString("boolean","TURE");
+	return BOOLEAN_CONST;
+}
 
 [/][/]([a-zA-Z \t])* {
 		LIST;
@@ -105,6 +115,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 	}
 		return IDENTIFIER;
 }
+
 {integer} {
 	tokenInteger("integer",atoi(yytext));
 	return INT_CONST;
