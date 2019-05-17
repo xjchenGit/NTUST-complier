@@ -1,29 +1,32 @@
 %{
 #include <iostream>
 #include <stdio.h>
+#include <map>
 #include <string.h>
 #include <string>
 using namespace std;
-int  yylex  (void);
 void yyerror(const char *s);
+
 %}
 
 %union{
     int val;
     double dval;
     char* sval;
-    int bval;
+    bool bval;
     int type;
 };
 
 %token AND OR EQ LE_EQ GR_EQ NEQ EQ
-%token ARRAY BOOLEAN T_BEGIN BREAK CHAR CASE CONST CONTINUE DO ELSE END EXIT FALSE FOR FN IF IN INTEGER LOOP MODULE PRINT PRINTLN PROCEDURE REPEAT RETURN REAL STRING RECORD THEN TURE TYPE USE UTIL VAR WHILE
+%token ARRAY BOOLEAN T_BEGIN BREAK CHAR CASE CONST CONTINUE DO ELSE END EXIT 
+%token FALSE FOR FN IF IN INTEGER LOOP MODULE PRINT PRINTLN PROCEDURE REPEAT 
+%token RETURN REAL STRING RECORD THEN TURE TYPE USE UTIL VAR WHILE
 %token OF READ
 %token <sval> IDENTIFIER
 %token <val> INT_CONST
 %token <dval> REAL_CONST
 %token <sval> STR_CONST
-%token <bval> BOOL_CONST
+%token <bval> BOOL_CONST //还没添加上去
 //%type <type> var_type
 //%start program
 /*precedence*/

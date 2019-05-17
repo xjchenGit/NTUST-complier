@@ -61,7 +61,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "else"	{token(ELSE);return ELSE;}
 "end"	{token(END);return END;}
 "exit"	{token(EXIT);return EXIT;}
-"false"	{token(FALSE);return FALSE;}
+
 "for"	{token(FOR);return FOR;}
 "fn"	{token(FN);return FN;}
 "if"	{token(IF);return IF;}
@@ -78,12 +78,13 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "string"	{token(STRING);return STRING;}
 "record"	{token(RECORD);return RECORD;}
 "then"	{token(THEN);return THEN;}
-"ture"	{token(TURE);return TURE;}
 "type"	{token(TYPE);return TYPE;}
 "use"	{token(USE);return USE;}
 "util"	{token(UTIL);return UTIL;}
 "var"	{token(VAR);return VAR;}
 "while"	{token(WHILE);return WHILE;}
+"false"	{token(FALSE);return FALSE;}
+"ture"	{token(TURE);return TURE;}
 
 [/][/]([a-zA-Z \t])* {
 		LIST;

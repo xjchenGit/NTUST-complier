@@ -72,7 +72,15 @@ y.tab.c 拷贝Delarations和User subroutines的内容
 
 production+符号优先级->LALR(1)表  输出到output
 
+# symbol table
+经常使用hash table来管理
 
-# 目前错误
-y.tab.h  97/56/108
-lex.yy.c    125/289
+**四个function:**
+create():新建一个symbol table
+lookup(s):return string s的index,如果s没有找到就return nil
+insert(s):insert a new entry进入symbol table，还有return index of entry
+dump():Dumps all entries of symbol table,还有return index of entry.
+
+- 如果进入一个function就Push一个symbol table,离开function的时候就pop
+- 将variable和constants和procddure declarationsInsert insert
+- Lookup entries in the symbol table 
