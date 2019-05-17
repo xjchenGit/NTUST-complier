@@ -81,6 +81,24 @@ lookup(s):return string s的index,如果s没有找到就return nil
 insert(s):insert a new entry进入symbol table，还有return index of entry
 dump():Dumps all entries of symbol table,还有return index of entry.
 
+ 
+
+
+## 1、Assignment
 - 如果进入一个function就Push一个symbol table,离开function的时候就pop
 - 将variable和constants和procddure declarationsInsert insert
-- Lookup entries in the symbol table 
+- Lookup entries in the symbol table
+## Data Types and Declarations
+const：不能在Global里reassigned.
+var:
+type:
+procedure:如果procedure没有return值不能在expressions里面使用。
+
+literal constants\varible names\function invocations\array reference
+
+function invocation:  id<很多个表达式>
+
+## 错误
+- 表达式左边的id type必须和右边的id type一样
+- 如果end结束的id不跟开始的一样就报错、function的也一样
+- 参数的type和声明的type一定要一样
