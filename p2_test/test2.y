@@ -2,15 +2,23 @@
 #include <iostream>
 #include <stdio.h>
 #include <map>
-#include <string.h>
+#include <cmath>
 #include <string>
 #include <vector>
-#include "lex.yy.cpp"
 #include "Symbol.hpp"
+#include "lex.yy.cpp"
 using namespace std;
-int yylex();
-void yyerror(const char *s);
 
+enum type{
+    STRING_type,
+    INTEGER_type,
+    REAL_type,
+    BOOLEAN_type
+};
+
+
+int yylex();
+void yyerror(string error_str);
 vector<SymbolTable> stack;
 
 %}
@@ -19,6 +27,7 @@ vector<SymbolTable> stack;
     int val;
     double dval;
     std::string* sval;
+    DataItem* id_data;
     bool bval;
     int type;
 };
@@ -32,8 +41,10 @@ vector<SymbolTable> stack;
 %token <val> INT_CONST
 %token <dval> REAL_CONST
 %token <sval> STR_CONST
-%token <bval> BOOLEAN_CONST //还没添加上去
-//%type <type> var_type
+%token <bval> BOOLEAN_CONST
+//%type <id_data> const_value
+// expression function_invocation
+//%type <type> data_type
 /*precedence*/
 %left '*' '/'
 %left '+' '-'
@@ -45,20 +56,12 @@ vector<SymbolTable> stack;
 
 %%
 
-program:    MODULE IDENTIFIER optional_var_con_declaration Procedure_dec 
-            _BEGIN optional_statement END IDENTIFIER '.'
-            {
-                if($2==$8)
-                    cout << "module id successed" << endl; 
-            }
+program:    MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END IDENTIFIER '.'
+    
             ;
 
 Procedure_dec:  PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
-                {
-                    if($2==$9)
-                        cout << "procedure id successed" << endl;
-                }
                 |
                 ;
 
@@ -93,26 +96,20 @@ opt_func_type: ':' data_type
             |
             ;
 
-data_type:      STRING
-            |   INTEGER
-            |   BOOLEAN
-            |   REAL
+data_type:      STRING 
+            |   INTEGER 
+            |   BOOLEAN 
+            |   REAL 
             ;
 
-const_value:    INT_CONST
-            |   BOOLEAN_CONST
-            |   REAL_CONST
-            |   STR_CONST
+const_value:    INT_CONST 
+            |   BOOLEAN_CONST 
+            |   REAL_CONST 
+            |   STR_CONST 
             ;
 
 statement:      IDENTIFIER EQ expression ';'
-                {
-                    cout << "left must eq right" << endl;
-                }
             |   IDENTIFIER '[' expression ']' EQ expression ';'
-                {
-                    cout << "The expression must be array~"<<endl;
-                }
             |   PRINT expression ';'
             |   PRINTLN expression ';'
             |   READ IDENTIFIER ';'
@@ -164,8 +161,8 @@ optional_comma_separated_expression:    expression
 
 %%
 
-void yyerror(const char *str){
-    printf("error:%s\n",str);
+void yyerror(string error_str){
+    cout << error_str;
 }
 int yywrap(){
     return 1;

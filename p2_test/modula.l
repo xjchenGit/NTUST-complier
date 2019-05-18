@@ -1,9 +1,8 @@
 %{
 #include <iostream>
-#include <stdio.h>
-#include <string.h>
 #include <string>
 #include "y.tab.hpp"
+#include <map>
 #define MAX_LINE_LENG 256
 #define LIST	strcat(buf,yytext)
 #define token(t) {LIST;printf("<%s>\n",#t);}
@@ -12,8 +11,7 @@
 using namespace std;
 int linenum = 1;
 char buf[MAX_LINE_LENG];
-char table[256][256];
-int table_index = 0;
+
 %}
 
 digits [0-9]
@@ -102,18 +100,8 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 
 {identifiers} {
 	tokenString("id",yytext);
-	int lookup = 0;
-	for(int i = 0; i < table_index; i++){
-		if(!strcmp(table[i],yytext)){
-			lookup = 1;
-			break;
-		}
-	}
-	if(!lookup){
-		strcpy(table[table_index],yytext);
-		table_index++;
-	}
-		return IDENTIFIER;
+	yylval.sval = new string(yytext);
+	return IDENTIFIER;
 }
 
 {integer} {
@@ -129,7 +117,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 {str} {
 	int i=1;
 	char num[256];
-        int num_idx = 0;
+    int num_idx = 0;
 	while(yytext[i]!='\0'){
 		if(yytext[i]=='\"'&&yytext[i+1]=='\"'){
 			num[num_idx] = yytext[i];
@@ -172,8 +160,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 
 \n {
 	LIST;
-	printf("%d:%s",linenum,buf);
-	linenum++;
+	printf("%d:%s",linenum++,buf);
 	buf[0] = '\0';
 	}
 
@@ -186,3 +173,17 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 		exit(-1);
 	}
 %%
+
+//	id的存值
+
+// int lookup = 0;
+// 	for(int i = 0; i < table_index; i++){
+// 		if(!strcmp(table[i],yytext)){
+// 			lookup = 1;
+// 			break;
+// 		}
+// 	}
+// 	if(!lookup){
+// 		strcpy(table[table_index],yytext);
+// 		table_index++;
+// 	}
