@@ -24,11 +24,11 @@ vector<SymbolTable> stack;
 %}
 
 %union{
-    int val;
-    double dval;
-    std::string* sval;
+    int _val;
+    double d_val;
+    std::string* s_val;
     DataItem* id_data;
-    bool bval;
+    bool b_val;
     int type;
 };
 
@@ -37,14 +37,15 @@ vector<SymbolTable> stack;
 %token FALSE FOR FN IF IN INTEGER LOOP MODULE PRINT PRINTLN PROCEDURE REPEAT 
 %token RETURN REAL STRING RECORD THEN TURE TYPE USE UTIL VAR WHILE
 %token OF READ
-%token <sval> IDENTIFIER
-%token <val> INT_CONST
-%token <dval> REAL_CONST
-%token <sval> STR_CONST
-%token <bval> BOOLEAN_CONST
-//%type <id_data> const_value
+%token <s_val> IDENTIFIER
+%token <_val> INT_CONST
+%token <d_val> REAL_CONST
+%token <s_val> STR_CONST
+%token <b_val> BOOLEAN_CONST
+//%type <id_data> 
+//const_value
 // expression function_invocation
-//%type <type> data_type
+%type <type> data_type
 /*precedence*/
 %left '*' '/'
 %left '+' '-'
@@ -57,7 +58,7 @@ vector<SymbolTable> stack;
 %%
 
 program:    MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END IDENTIFIER '.'
-    
+            
             ;
 
 Procedure_dec:  PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration 
@@ -67,6 +68,9 @@ Procedure_dec:  PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type opti
 
 optional_var_con_declaration:  constants optional_var_con_declaration
                             |  variables optional_var_con_declaration
+                            {
+
+                            }
                             |   
                             ;
 
@@ -75,7 +79,6 @@ constants:  CONST IDENTIFIER '=' expression ';'
          ;
 
 variables:      VAR opt_IDENTIFIER ':' data_type ';'
-            |   IDENTIFIER ':' data_type ';'
             |   IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
             ;
                         
@@ -96,15 +99,15 @@ opt_func_type: ':' data_type
             |
             ;
 
-data_type:      STRING 
-            |   INTEGER 
-            |   BOOLEAN 
-            |   REAL 
+data_type:      STRING { $$=STRING_type; }
+            |   INTEGER { $$=INTEGER_type; }
+            |   BOOLEAN {$$=BOOLEAN_type;}
+            |   REAL {$$=REAL_type;}
             ;
 
-const_value:    INT_CONST 
-            |   BOOLEAN_CONST 
-            |   REAL_CONST 
+const_value:    INT_CONST
+            |   BOOLEAN_CONST
+            |   REAL_CONST
             |   STR_CONST 
             ;
 

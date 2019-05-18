@@ -86,11 +86,13 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 
 "false"	{
 	tokenString("boolean","FALSE");
+	yylval.b_val = 0;
 	return BOOLEAN_CONST;
 }
 
 "ture"	{
 	tokenString("boolean","TURE");
+	yylval.b_val = 1;
 	return BOOLEAN_CONST;
 }
 
@@ -100,17 +102,19 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 
 {identifiers} {
 	tokenString("id",yytext);
-	yylval.sval = new string(yytext);
+	yylval.s_val = new string(yytext);
 	return IDENTIFIER;
 }
 
 {integer} {
 	tokenInteger("integer",atoi(yytext));
+	yylval._val = atoi(yytext);
 	return INT_CONST;
 }
 
 {real} {
 	tokenString("real",yytext);
+	yylval.d_val = atof(yytext);
 	return REAL_CONST;
 }
 
@@ -135,6 +139,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 	}
 	num[num_idx] = '\0';
 	tokenString("str",num);
+	yylval.s_val = new string (yytext);
 	return STR_CONST;
 }
 
