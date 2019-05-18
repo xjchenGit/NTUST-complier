@@ -37,7 +37,7 @@ local constant&varitables(function)
 ### Semantic Definition
 - parameter passing
 - Scope rules
-- 在program或procedure的end之后的IDENTIFIERS一定要和在beginning那里declaration的name一样
+- [x]在program或procedure的end之后的IDENTIFIERS一定要和在beginning那里declaration的name一样
 - types of the left-hand-side id and the right-hand-side expression of every assignment must be matched
 - the type of formal parameters must match the type of the actual parameters
 

@@ -45,41 +45,21 @@ vector<SymbolTable> stack;
 
 %%
 
-program:    MODULE IDENTIFIER optional_var_con_declaration Procedure_dec
-            
-            mod_begin_end
-            ;
-
-Procedure_dec:  PROCEDURE Procedure_id optional_arg_parentheses opt_func_type
-                optional_var_con_declaration
-                pro_begin_end
-                |
-                ;
-
-Procedure_id: IDENTIFIER
-            ;
-
-mod_begin_end:  _BEGIN 
-            optional_statement
-            END IDENTIFIER 
-            '.'
+program:    MODULE IDENTIFIER optional_var_con_declaration Procedure_dec 
+            _BEGIN optional_statement END IDENTIFIER '.'
             {
-                stack.back().Dump();
+                if($2==$8)
+                    cout << "module id successed" << endl; 
             }
             ;
 
-pro_begin_end:
-                 _BEGIN
-                 {
-                     SymbolTable temp = stack.back()
-                     stack.push_back(temp)
-                 }
-                 optional_statement
-                 END IDENTIFIER ';'
-                 {
-                    stack.back().Dump();
-                    stack.pop_back();
-                 }
+Procedure_dec:  PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration 
+                _BEGIN optional_statement END IDENTIFIER ';'
+                {
+                    if($2==$9)
+                        cout << "procedure id successed" << endl;
+                }
+                |
                 ;
 
 optional_var_con_declaration:  constants optional_var_con_declaration
@@ -87,7 +67,7 @@ optional_var_con_declaration:  constants optional_var_con_declaration
                             |   
                             ;
 
-constants:  CONST IDENTIFIER '=' expression ';' { $$  }
+constants:  CONST IDENTIFIER '=' expression ';'
         |   IDENTIFIER '=' expression ';' 
          ;
 
@@ -125,14 +105,19 @@ const_value:    INT_CONST
             |   STR_CONST
             ;
 
-statement:      IDENTIFIER EQ expression ';'{}
+statement:      IDENTIFIER EQ expression ';'
+                {
+                    cout << "left must eq right" << endl;
+                }
             |   IDENTIFIER '[' expression ']' EQ expression ';'
+                {
+                    cout << "The expression must be array~"<<endl;
+                }
             |   PRINT expression ';'
             |   PRINTLN expression ';'
             |   READ IDENTIFIER ';'
             |   RETURN ';'
             |   RETURN expression ';'
-            |   function_invocation ';'
 	        |	expression ';'
             |   conditional_statement
             |   loop_statement
@@ -148,7 +133,6 @@ expression:     IDENTIFIER
             |   expression '<' expression
             |   expression '>' expression
             |   expression '=' expression
-	        |   expression EQ expression
             |   expression LE_EQ expression
             |   expression GR_EQ expression
             |   NEQ expression
@@ -160,24 +144,15 @@ expression:     IDENTIFIER
             |   '-' expression %prec UMINUS
             ;
 
-conditional_statement:      IF '(' expression ')' THEN
-                            optional_statement
-                            ELSE
-                            optional_statement
-                            END ';'
-                        |   IF '(' expression ')' THEN
-                            optional_statement
-                            END ';'
+conditional_statement:      IF '(' expression ')' THEN optional_statement ELSE optional_statement END ';'
+                        |   IF '(' expression ')' THEN optional_statement END ';'
                         ;
 
-loop_statement: WHILE '(' expression ')' DO 
-                optional_statement
-                END ';'
+loop_statement: WHILE '(' expression ')' DO optional_statement END ';'
                 ;
 
 optional_statement:    statement optional_statement
                     |  statement
-                    |
 	   	            ;
 
 function_invocation:    IDENTIFIER '(' optional_comma_separated_expression ')'
@@ -200,5 +175,8 @@ int main(){
     SymbolTable global;
     stack.push_back(global);
     yyparse();
+    // cout << ("\n--------------------------------------------\n\t\tSymbol Table");
+    // cout << ("\n--------------------------------------------\n");
+    // cout << ("Name\tType\tValue\t\tentries\n");
 	return 0;	
 }

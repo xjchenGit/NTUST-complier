@@ -45,10 +45,6 @@ bool SymbolTable::insert(string s,DataItem value)
 }
 
 int SymbolTable::Dump(){
-    cout << ("\n--------------------------------------------\n\t\tSymbol Table");
-    cout << ("\n--------------------------------------------\n");
-    
-    cout << ("Name\tType\tValue\t\tentries\n");
     for(auto it = IdSymbols.begin();it != IdSymbols.end();++it)
     {
         cout
