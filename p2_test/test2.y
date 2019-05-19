@@ -10,18 +10,12 @@
 using namespace std;
 #define TRACE_FLAG 1
 #define Trace(t) if (TRACE_FLAG) cout << "TRACE => " << t <<endl;
-enum type{
-    STRING_type,
-    INTEGER_type,
-    REAL_type,
-    BOOLEAN_type
-};
-
 
 int yylex();
 void yyerror(string error_str);
 vector<SymbolTable> stack;
-
+SymbolTable SymbolList;
+vector<string> id_arr;
 %}
 
 %union{
@@ -45,7 +39,7 @@ vector<SymbolTable> stack;
 %token <b_val> BOOLEAN_CONST
 %type <id_data> const_value expression function_invocation
 //%type <id_data> opt_IDENTIFIER
-%type <type> data_type 
+%type <type> data_type opt_func_type
 /*precedence*/
 %left '*' '/'
 %left '+' '-'
@@ -57,47 +51,130 @@ vector<SymbolTable> stack;
 
 %%
 
-program:    MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END IDENTIFIER '.'
+program:    MODULE IDENTIFIER 
+            {
+                DataItem* id = new DataItem();
+                id->IdName=*$2;
+                id->entries="module";
+                int a=stack.back().insert(*$2,*id);
+                // if(a)
+                // {   cout << ("--------------------------------------------")<<endl;
+                //     cout<<"pro_id insert successedfull!"<<endl;
+                //     cout << ("--------------------------------------------")<<endl;
+                // }
+            }
+            optional_var_con_declaration Procedure_dec
+            {
+                stack.back().Dump();
+            }
+             _BEGIN optional_statement END IDENTIFIER '.'
+            {
+                if(*$2!=*$10)
+                    yyerror("End's id != Module's id\n");
+            }
             ;
 
-
-
 Procedure_dec:  PROCEDURE IDENTIFIER 
-                optional_arg_parentheses opt_func_type optional_var_con_declaration 
+                {
+                    SymbolTable temp;
+                    stack.push_back(temp);
+                }
+                optional_arg_parentheses opt_func_type
+                {
+                    
+                    DataItem* func_id = new DataItem();
+                    func_id->IdName=*$2;
+                    func_id->type=$5;
+                    func_id->entries="Procedure";
+                    int a=stack[0].insert(*$2,*func_id);
+                    if(a)
+                    {   cout << ("--------------------------------------------")<<endl;
+                        cout<<"procedure_id insert successedfull!"<<endl;
+                        cout << ("--------------------------------------------")<<endl;
+                    }
+                    stack.back().Dump();
+                }
+                optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
+                {
+                    if(*$2!=*$11)
+                        yyerror("End's id != Procedure's id");
+                    stack.back().Dump();
+                    stack.pop_back();
+                    Trace("procedure");
+                }
                 | 
                 ;
 
+opt_func_type: ':' data_type
+            {
+                $$=$2;
+            }
+            |
+            {Trace("null");}
+            ;
+
 optional_var_con_declaration:  constants optional_var_con_declaration
                             |  variables optional_var_con_declaration
-                            {
-
-                            }
                             |   
                             ;
 
 constants:  CONST IDENTIFIER '=' expression ';'
         {
             $4 -> IdName = *$2;
+            $4 -> entries = "const";
             int a=stack.back().insert(*$2,*($4));
-            if(a)
-                cout<<"insert successful!";
+            if(a){
+                cout << ("--------------------------------------------")<<endl;
+                cout<<"const insert successful!"<<endl;
+                cout << ("--------------------------------------------")<<endl;
+            }
         }
         |   IDENTIFIER '=' expression ';' 
         {
             $3 -> IdName = *$1;
+            $3 -> entries = "const";
             int a=stack.back().insert(*$1,*($3));
-            if(a)
-                cout<<"insert successful!";
+            if(a){
+                cout << ("--------------------------------------------")<<endl;
+                cout<<"const insert successful!"<<endl;
+                cout << ("--------------------------------------------")<<endl;
+            }
         }
         ;
 
 variables:      VAR opt_IDENTIFIER ':' data_type ';'
+            {
+                for(int i=0;i<id_arr.size();i++){
+                    DataItem* tempData = new DataItem();
+                    tempData->IdName = id_arr[i];
+                    tempData->type = $4;
+                    tempData->entries = "variables";
+                    int a=stack.back().insert(id_arr[i],*tempData);
+                    if(a)
+                    {   cout << ("--------------------------------------------")<<endl;
+                        cout<<"variable insert successful!"<<endl;
+                        cout << ("--------------------------------------------")<<endl;
+                    }
+                }
+                id_arr.clear();
+            }
             |   IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
+            {
+                Trace("array");
+            }
             ;
                         
 opt_IDENTIFIER:		IDENTIFIER ',' opt_IDENTIFIER
+          {   
+              string s=*$1;
+              id_arr.push_back(s);
+          }
 	      |		IDENTIFIER
+          {
+              string s=*$1;
+              id_arr.push_back(s);
+          }
 	      ;
 
 optional_arg_parentheses: '(' optional_arguments ')'
@@ -106,24 +183,34 @@ optional_arg_parentheses: '(' optional_arguments ')'
 
 optional_arguments: IDENTIFIER ':' data_type
                 {
-                    struct DataItem* tempData;
+                    DataItem* tempData=new DataItem();
                     tempData->IdName=*$1;
                     tempData->type=$3;
-                    stack.back().insert(*$1,*tempData);
+                    tempData->entries="argument";
+                    int a=stack.back().insert(*$1,*tempData);
+                    if(a){
+                        cout << ("--------------------------------------------")<<endl;
+                        cout<<"argument insert successful!"<<endl;
+                        cout << ("--------------------------------------------")<<endl;
+                    }
                 }
                 |   optional_arguments ',' IDENTIFIER ':' data_type
                 {
-                    struct DataItem* tempData;
+                    DataItem* tempData=new DataItem();
                     tempData->IdName=*$3;
                     tempData->type=$5;
-                    stack.back().insert(*$3,*tempData);
+                    tempData->entries="argument";
+                    int a=stack.back().insert(*$3,*tempData);
+                    if(a){
+                        cout << ("--------------------------------------------")<<endl;
+                        cout<<"argument insert successful!"<<endl;
+                        cout << ("--------------------------------------------")<<endl;
+                    }
                 }
                 |   
                 ;
 
-opt_func_type: ':' data_type
-            |
-            ;
+
 
 data_type:      STRING { $$=STRING_type; }
             |   INTEGER { $$=INTEGER_type; }
@@ -132,22 +219,28 @@ data_type:      STRING { $$=STRING_type; }
             ;
 
 const_value:    INT_CONST {
-                struct DataItem* tempData;
+                DataItem* tempData = new DataItem();
+                tempData->type = INTEGER_type;
                 tempData->value = $1;
                 $$ = tempData;
             }
             |   BOOLEAN_CONST {
-                struct DataItem* tempData;
+                DataItem* tempData = new DataItem();
+                tempData->type = BOOLEAN_type;
                 tempData->value = $1;
                 $$ = tempData;
             }
             |   REAL_CONST {
-                struct DataItem* tempData;
+                DataItem* tempData = new DataItem();
+                tempData->type = REAL_type;
                 tempData->value = $1;
                 $$ = tempData;
             }
             |   STR_CONST {
-                Trace("STR_CONST");
+                DataItem* tempData = new DataItem();
+                tempData->type = STRING_type;
+                tempData->value = ($1)->c_str();
+                $$ = tempData;
             }
             ;
 
@@ -165,6 +258,10 @@ statement:      IDENTIFIER EQ expression ';'
 
 expression:     IDENTIFIER{
                 Trace("id");
+                struct DataItem* tempData;
+                tempData = stack.back().lookup(*$1);
+                if(tempData == NULL) yyerror("ERROR");
+                $$=tempData;
             }
             |   const_value
             |   function_invocation
@@ -179,33 +276,71 @@ expression:     IDENTIFIER{
             |   expression GR_EQ expression
             |   NEQ expression
             {
-                Trace("test");
+                Trace("NEQ expression");
             }
             |   '~' expression
             {
-                Trace("test");
+                Trace("'~' expression");
             }
             |   expression AND expression
             |   expression OR expression
             |   IDENTIFIER '[' expression ']'
             {
-                Trace("test");
+                Trace("IDENTIFIER '[' expression ']'");
             }
             |   '(' expression ')'
             {
-                Trace("test");
+                Trace("'(' expression ')'");
             }
             |   '-' expression %prec UMINUS
             {
-                Trace("test");
+                Trace("'-' expression %prec UMINUS");
             }
             ;
 
-conditional_statement:      IF '(' expression ')' THEN optional_statement ELSE optional_statement END ';'
-                        |   IF '(' expression ')' THEN optional_statement END ';'
+conditional_statement:  IF '(' expression ')' THEN
+                        {
+                            SymbolTable tempData = stack.back();
+                            stack.push_back(tempData);
+                        }
+                         optional_statement 
+                        {
+                            stack.back().Dump();
+                            stack.pop_back();
+                        }
+                         ELSE 
+                        {
+                            SymbolTable tempData = stack.back();
+                            stack.push_back(tempData);
+                        }
+                         optional_statement 
+                         END ';'
+                        {
+                            stack.back().Dump();
+                            stack.pop_back();
+                        }
+                        |   IF '(' expression ')' THEN
+                        {
+                            SymbolTable tempData = stack.back();
+                            stack.push_back(tempData);
+                        }
+                         optional_statement END ';'
+                        {
+                            stack.back().Dump();
+                            stack.pop_back();
+                        }
                         ;
 
-loop_statement: WHILE '(' expression ')' DO optional_statement END ';'
+loop_statement: WHILE '(' expression ')' DO
+                {
+                    SymbolTable tempData = stack.back();
+                    stack.push_back(tempData);
+                }
+                optional_statement END ';'
+                {
+                    stack.back().Dump();
+                    stack.pop_back();
+                }
                 ;
 
 optional_statement:    statement optional_statement
@@ -214,7 +349,7 @@ optional_statement:    statement optional_statement
 
 function_invocation:    IDENTIFIER '(' optional_comma_separated_expression ')'
                     {
-                        Trace("test");
+                        Trace("IDENTIFIER '(' optional_comma_separated_expression ')'");
                     }
                     ;
 
@@ -229,6 +364,15 @@ void yyerror(string error_str){
 }
 int yywrap(){
     return 1;
+}
+
+DataItem* lookupAll(string s) {
+	for(int i=stack.size()-1;i>=0;i--){
+		if(stack[i].lookup(s)){
+			return stack[i].lookup(s);
+		}
+	}
+    return NULL;
 }
 
 int main(){
