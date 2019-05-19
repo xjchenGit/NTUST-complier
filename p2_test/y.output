@@ -18,8 +18,7 @@ Terminals unused in grammar
    UTIL
 
 
-State 75 conflicts: 2 reduce/reduce
-State 80 conflicts: 1 shift/reduce
+State 159 conflicts: 1 reduce/reduce
 
 
 Grammar
@@ -29,17 +28,17 @@ Grammar
     1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END IDENTIFIER '.'
 
     2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';'
-    3              | %empty
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' Procedure_dec
+    4              | %empty
 
-    4 optional_var_con_declaration: constants optional_var_con_declaration
-    5                             | variables optional_var_con_declaration
-    6                             | %empty
+    5 optional_var_con_declaration: constants optional_var_con_declaration
+    6                             | variables optional_var_con_declaration
+    7                             | %empty
 
-    7 constants: CONST IDENTIFIER '=' expression ';'
-    8          | IDENTIFIER '=' expression ';'
+    8 constants: CONST IDENTIFIER '=' expression ';'
+    9          | IDENTIFIER '=' expression ';'
 
-    9 variables: VAR opt_IDENTIFIER ':' data_type ';'
-   10          | IDENTIFIER ':' data_type ';'
+   10 variables: VAR opt_IDENTIFIER ':' data_type ';'
    11          | IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
 
    12 opt_IDENTIFIER: IDENTIFIER ',' opt_IDENTIFIER
@@ -72,110 +71,108 @@ Grammar
    33          | READ IDENTIFIER ';'
    34          | RETURN ';'
    35          | RETURN expression ';'
-   36          | function_invocation ';'
-   37          | expression ';'
-   38          | conditional_statement
-   39          | loop_statement
+   36          | expression ';'
+   37          | conditional_statement
+   38          | loop_statement
 
-   40 expression: IDENTIFIER
-   41           | const_value
-   42           | function_invocation
-   43           | expression '*' expression
-   44           | expression '/' expression
-   45           | expression '+' expression
-   46           | expression '-' expression
-   47           | expression '<' expression
-   48           | expression '>' expression
-   49           | expression '=' expression
-   50           | expression LE_EQ expression
-   51           | expression GR_EQ expression
-   52           | NEQ expression
-   53           | '~' expression
-   54           | expression AND expression
-   55           | expression OR expression
-   56           | IDENTIFIER '[' expression ']'
-   57           | '(' expression ')'
-   58           | '-' expression
+   39 expression: IDENTIFIER
+   40           | const_value
+   41           | function_invocation
+   42           | expression '*' expression
+   43           | expression '/' expression
+   44           | expression '+' expression
+   45           | expression '-' expression
+   46           | expression '<' expression
+   47           | expression '>' expression
+   48           | expression '=' expression
+   49           | expression LE_EQ expression
+   50           | expression GR_EQ expression
+   51           | NEQ expression
+   52           | '~' expression
+   53           | expression AND expression
+   54           | expression OR expression
+   55           | IDENTIFIER '[' expression ']'
+   56           | '(' expression ')'
+   57           | '-' expression
 
-   59 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement END ';'
-   60                      | IF '(' expression ')' THEN optional_statement END ';'
+   58 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement END ';'
+   59                      | IF '(' expression ')' THEN optional_statement END ';'
 
-   61 loop_statement: WHILE '(' expression ')' DO optional_statement END ';'
+   60 loop_statement: WHILE '(' expression ')' DO optional_statement END ';'
 
-   62 optional_statement: statement optional_statement
-   63                   | statement
-   64                   | %empty
+   61 optional_statement: statement optional_statement
+   62                   | statement
 
-   65 function_invocation: IDENTIFIER '(' optional_comma_separated_expression ')'
+   63 function_invocation: IDENTIFIER '(' optional_comma_separated_expression ')'
 
-   66 optional_comma_separated_expression: expression
-   67                                    | optional_comma_separated_expression ',' expression
+   64 optional_comma_separated_expression: expression
+   65                                    | optional_comma_separated_expression ',' expression
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'(' (40) 14 57 59 60 61 65
-')' (41) 14 57 59 60 61 65
-'*' (42) 43
-'+' (43) 45
-',' (44) 11 12 17 67
-'-' (45) 46 58
+'(' (40) 14 56 58 59 60 63
+')' (41) 14 56 58 59 60 63
+'*' (42) 42
+'+' (43) 44
+',' (44) 11 12 17 65
+'-' (45) 45 57
 '.' (46) 1
-'/' (47) 44
-':' (58) 9 10 11 16 17 19
-';' (59) 2 7 8 9 10 11 29 30 31 32 33 34 35 36 37 59 60 61
-'<' (60) 47
-'=' (61) 7 8 49
-'>' (62) 48
-'[' (91) 11 30 56
-']' (93) 11 30 56
-'~' (126) 53
+'/' (47) 43
+':' (58) 10 11 16 17 19
+';' (59) 2 3 8 9 10 11 29 30 31 32 33 34 35 36 58 59 60
+'<' (60) 46
+'=' (61) 8 9 48
+'>' (62) 47
+'[' (91) 11 30 55
+']' (93) 11 30 55
+'~' (126) 52
 error (256)
-AND (258) 54
-OR (259) 55
+AND (258) 53
+OR (259) 54
 EQ (260) 29 30
-LE_EQ (261) 50
-GR_EQ (262) 51
-NEQ (263) 52
+LE_EQ (261) 49
+GR_EQ (262) 50
+NEQ (263) 51
 ARRAY (264) 11
 BOOLEAN (265) 23
-_BEGIN (266) 1 2
+_BEGIN (266) 1 2 3
 BREAK (267)
 CHAR (268)
 CASE (269)
-CONST (270) 7
+CONST (270) 8
 CONTINUE (271)
-DO (272) 61
-ELSE (273) 59
-END (274) 1 2 59 60 61
+DO (272) 60
+ELSE (273) 58
+END (274) 1 2 3 58 59 60
 EXIT (275)
 FALSE (276)
 FOR (277)
 FN (278)
-IF (279) 59 60
+IF (279) 58 59
 IN (280)
 INTEGER (281) 22
 LOOP (282)
 MODULE (283) 1
 PRINT (284) 31
 PRINTLN (285) 32
-PROCEDURE (286) 2
+PROCEDURE (286) 2 3
 REPEAT (287)
 RETURN (288) 34 35
 REAL (289) 24
 STRING (290) 21
 RECORD (291)
-THEN (292) 59 60
+THEN (292) 58 59
 TURE (293)
 TYPE (294)
 USE (295)
 UTIL (296)
-VAR (297) 9
-WHILE (298) 61
+VAR (297) 10
+WHILE (298) 60
 OF (299) 11
 READ (300) 33
-IDENTIFIER (301) 1 2 7 8 10 11 12 13 16 17 29 30 33 40 56 65
+IDENTIFIER (301) 1 2 3 8 9 11 12 13 16 17 29 30 33 39 55 63
 INT_CONST (302) 11 25
 REAL_CONST (303) 27
 STR_CONST (304) 28
@@ -190,41 +187,41 @@ $accept (68)
 program (69)
     on left: 1, on right: 0
 Procedure_dec (70)
-    on left: 2 3, on right: 1
+    on left: 2 3 4, on right: 1 3
 optional_var_con_declaration (71)
-    on left: 4 5 6, on right: 1 2 4 5
+    on left: 5 6 7, on right: 1 2 3 5 6
 constants (72)
-    on left: 7 8, on right: 4
+    on left: 8 9, on right: 5
 variables (73)
-    on left: 9 10 11, on right: 5
+    on left: 10 11, on right: 6
 opt_IDENTIFIER (74)
-    on left: 12 13, on right: 9 12
+    on left: 12 13, on right: 10 12
 optional_arg_parentheses (75)
-    on left: 14 15, on right: 2
+    on left: 14 15, on right: 2 3
 optional_arguments (76)
     on left: 16 17 18, on right: 14 17
 opt_func_type (77)
-    on left: 19 20, on right: 2
+    on left: 19 20, on right: 2 3
 data_type (78)
-    on left: 21 22 23 24, on right: 9 10 11 16 17 19
+    on left: 21 22 23 24, on right: 10 11 16 17 19
 const_value (79)
-    on left: 25 26 27 28, on right: 41
+    on left: 25 26 27 28, on right: 40
 statement (80)
-    on left: 29 30 31 32 33 34 35 36 37 38 39, on right: 62 63
+    on left: 29 30 31 32 33 34 35 36 37 38, on right: 61 62
 expression (81)
-    on left: 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57
-    58, on right: 7 8 29 30 31 32 35 37 43 44 45 46 47 48 49 50 51
-    52 53 54 55 56 57 58 59 60 61 66 67
+    on left: 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56
+    57, on right: 8 9 29 30 31 32 35 36 42 43 44 45 46 47 48 49 50
+    51 52 53 54 55 56 57 58 59 60 64 65
 conditional_statement (82)
-    on left: 59 60, on right: 38
+    on left: 58 59, on right: 37
 loop_statement (83)
-    on left: 61, on right: 39
+    on left: 60, on right: 38
 optional_statement (84)
-    on left: 62 63 64, on right: 1 2 59 60 61 62
+    on left: 61 62, on right: 1 2 3 58 59 60 61
 function_invocation (85)
-    on left: 65, on right: 36 42
+    on left: 63, on right: 41
 optional_comma_separated_expression (86)
-    on left: 66 67, on right: 65 67
+    on left: 64 65, on right: 63 65
 
 
 State 0
@@ -258,7 +255,7 @@ State 3
     VAR         shift, and go to state 6
     IDENTIFIER  shift, and go to state 7
 
-    $default  reduce using rule 6 (optional_var_con_declaration)
+    $default  reduce using rule 7 (optional_var_con_declaration)
 
     optional_var_con_declaration  go to state 8
     constants                     go to state 9
@@ -274,14 +271,14 @@ State 4
 
 State 5
 
-    7 constants: CONST . IDENTIFIER '=' expression ';'
+    8 constants: CONST . IDENTIFIER '=' expression ';'
 
     IDENTIFIER  shift, and go to state 11
 
 
 State 6
 
-    9 variables: VAR . opt_IDENTIFIER ':' data_type ';'
+   10 variables: VAR . opt_IDENTIFIER ':' data_type ';'
 
     IDENTIFIER  shift, and go to state 12
 
@@ -290,9 +287,8 @@ State 6
 
 State 7
 
-    8 constants: IDENTIFIER . '=' expression ';'
-   10 variables: IDENTIFIER . ':' data_type ';'
-   11          | IDENTIFIER . ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
+    9 constants: IDENTIFIER . '=' expression ';'
+   11 variables: IDENTIFIER . ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
 
     '='  shift, and go to state 14
     ':'  shift, and go to state 15
@@ -304,20 +300,20 @@ State 8
 
     PROCEDURE  shift, and go to state 16
 
-    $default  reduce using rule 3 (Procedure_dec)
+    $default  reduce using rule 4 (Procedure_dec)
 
     Procedure_dec  go to state 17
 
 
 State 9
 
-    4 optional_var_con_declaration: constants . optional_var_con_declaration
+    5 optional_var_con_declaration: constants . optional_var_con_declaration
 
     CONST       shift, and go to state 5
     VAR         shift, and go to state 6
     IDENTIFIER  shift, and go to state 7
 
-    $default  reduce using rule 6 (optional_var_con_declaration)
+    $default  reduce using rule 7 (optional_var_con_declaration)
 
     optional_var_con_declaration  go to state 18
     constants                     go to state 9
@@ -326,13 +322,13 @@ State 9
 
 State 10
 
-    5 optional_var_con_declaration: variables . optional_var_con_declaration
+    6 optional_var_con_declaration: variables . optional_var_con_declaration
 
     CONST       shift, and go to state 5
     VAR         shift, and go to state 6
     IDENTIFIER  shift, and go to state 7
 
-    $default  reduce using rule 6 (optional_var_con_declaration)
+    $default  reduce using rule 7 (optional_var_con_declaration)
 
     optional_var_con_declaration  go to state 19
     constants                     go to state 9
@@ -341,7 +337,7 @@ State 10
 
 State 11
 
-    7 constants: CONST IDENTIFIER . '=' expression ';'
+    8 constants: CONST IDENTIFIER . '=' expression ';'
 
     '='  shift, and go to state 20
 
@@ -358,14 +354,14 @@ State 12
 
 State 13
 
-    9 variables: VAR opt_IDENTIFIER . ':' data_type ';'
+   10 variables: VAR opt_IDENTIFIER . ':' data_type ';'
 
     ':'  shift, and go to state 22
 
 
 State 14
 
-    8 constants: IDENTIFIER '=' . expression ';'
+    9 constants: IDENTIFIER '=' . expression ';'
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -384,49 +380,43 @@ State 14
 
 State 15
 
-   10 variables: IDENTIFIER ':' . data_type ';'
-   11          | IDENTIFIER ':' . ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
+   11 variables: IDENTIFIER ':' . ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
 
-    ARRAY    shift, and go to state 35
-    BOOLEAN  shift, and go to state 36
-    INTEGER  shift, and go to state 37
-    REAL     shift, and go to state 38
-    STRING   shift, and go to state 39
-
-    data_type  go to state 40
+    ARRAY  shift, and go to state 35
 
 
 State 16
 
     2 Procedure_dec: PROCEDURE . IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';'
+    3              | PROCEDURE . IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' Procedure_dec
 
-    IDENTIFIER  shift, and go to state 41
+    IDENTIFIER  shift, and go to state 36
 
 
 State 17
 
     1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec . _BEGIN optional_statement END IDENTIFIER '.'
 
-    _BEGIN  shift, and go to state 42
+    _BEGIN  shift, and go to state 37
 
 
 State 18
 
-    4 optional_var_con_declaration: constants optional_var_con_declaration .
-
-    $default  reduce using rule 4 (optional_var_con_declaration)
-
-
-State 19
-
-    5 optional_var_con_declaration: variables optional_var_con_declaration .
+    5 optional_var_con_declaration: constants optional_var_con_declaration .
 
     $default  reduce using rule 5 (optional_var_con_declaration)
 
 
+State 19
+
+    6 optional_var_con_declaration: variables optional_var_con_declaration .
+
+    $default  reduce using rule 6 (optional_var_con_declaration)
+
+
 State 20
 
-    7 constants: CONST IDENTIFIER '=' . expression ';'
+    8 constants: CONST IDENTIFIER '=' . expression ';'
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -439,7 +429,7 @@ State 20
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 43
+    expression           go to state 38
     function_invocation  go to state 34
 
 
@@ -449,24 +439,24 @@ State 21
 
     IDENTIFIER  shift, and go to state 12
 
-    opt_IDENTIFIER  go to state 44
+    opt_IDENTIFIER  go to state 39
 
 
 State 22
 
-    9 variables: VAR opt_IDENTIFIER ':' . data_type ';'
+   10 variables: VAR opt_IDENTIFIER ':' . data_type ';'
 
-    BOOLEAN  shift, and go to state 36
-    INTEGER  shift, and go to state 37
-    REAL     shift, and go to state 38
-    STRING   shift, and go to state 39
+    BOOLEAN  shift, and go to state 40
+    INTEGER  shift, and go to state 41
+    REAL     shift, and go to state 42
+    STRING   shift, and go to state 43
 
-    data_type  go to state 45
+    data_type  go to state 44
 
 
 State 23
 
-   52 expression: NEQ . expression
+   51 expression: NEQ . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -479,20 +469,20 @@ State 23
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 46
+    expression           go to state 45
     function_invocation  go to state 34
 
 
 State 24
 
-   40 expression: IDENTIFIER .
-   56           | IDENTIFIER . '[' expression ']'
-   65 function_invocation: IDENTIFIER . '(' optional_comma_separated_expression ')'
+   39 expression: IDENTIFIER .
+   55           | IDENTIFIER . '[' expression ']'
+   63 function_invocation: IDENTIFIER . '(' optional_comma_separated_expression ')'
 
-    '['  shift, and go to state 47
-    '('  shift, and go to state 48
+    '['  shift, and go to state 46
+    '('  shift, and go to state 47
 
-    $default  reduce using rule 40 (expression)
+    $default  reduce using rule 39 (expression)
 
 
 State 25
@@ -525,7 +515,26 @@ State 28
 
 State 29
 
-   58 expression: '-' . expression
+   57 expression: '-' . expression
+
+    NEQ            shift, and go to state 23
+    IDENTIFIER     shift, and go to state 24
+    INT_CONST      shift, and go to state 25
+    REAL_CONST     shift, and go to state 26
+    STR_CONST      shift, and go to state 27
+    BOOLEAN_CONST  shift, and go to state 28
+    '-'            shift, and go to state 29
+    '~'            shift, and go to state 30
+    '('            shift, and go to state 31
+
+    const_value          go to state 32
+    expression           go to state 48
+    function_invocation  go to state 34
+
+
+State 30
+
+   52 expression: '~' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -542,9 +551,9 @@ State 29
     function_invocation  go to state 34
 
 
-State 30
+State 31
 
-   53 expression: '~' . expression
+   56 expression: '(' . expression ')'
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -561,133 +570,80 @@ State 30
     function_invocation  go to state 34
 
 
-State 31
-
-   57 expression: '(' . expression ')'
-
-    NEQ            shift, and go to state 23
-    IDENTIFIER     shift, and go to state 24
-    INT_CONST      shift, and go to state 25
-    REAL_CONST     shift, and go to state 26
-    STR_CONST      shift, and go to state 27
-    BOOLEAN_CONST  shift, and go to state 28
-    '-'            shift, and go to state 29
-    '~'            shift, and go to state 30
-    '('            shift, and go to state 31
-
-    const_value          go to state 32
-    expression           go to state 51
-    function_invocation  go to state 34
-
-
 State 32
 
-   41 expression: const_value .
+   40 expression: const_value .
 
-    $default  reduce using rule 41 (expression)
+    $default  reduce using rule 40 (expression)
 
 
 State 33
 
-    8 constants: IDENTIFIER '=' expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
+    9 constants: IDENTIFIER '=' expression . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 63
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 62
 
 
 State 34
 
-   42 expression: function_invocation .
+   41 expression: function_invocation .
 
-    $default  reduce using rule 42 (expression)
+    $default  reduce using rule 41 (expression)
 
 
 State 35
 
    11 variables: IDENTIFIER ':' ARRAY . '[' INT_CONST ',' INT_CONST ']' OF data_type ';'
 
-    '['  shift, and go to state 64
+    '['  shift, and go to state 63
 
 
 State 36
 
-   23 data_type: BOOLEAN .
+    2 Procedure_dec: PROCEDURE IDENTIFIER . optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';'
+    3              | PROCEDURE IDENTIFIER . optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' Procedure_dec
 
-    $default  reduce using rule 23 (data_type)
+    '('  shift, and go to state 64
+
+    $default  reduce using rule 15 (optional_arg_parentheses)
+
+    optional_arg_parentheses  go to state 65
 
 
 State 37
 
-   22 data_type: INTEGER .
-
-    $default  reduce using rule 22 (data_type)
-
-
-State 38
-
-   24 data_type: REAL .
-
-    $default  reduce using rule 24 (data_type)
-
-
-State 39
-
-   21 data_type: STRING .
-
-    $default  reduce using rule 21 (data_type)
-
-
-State 40
-
-   10 variables: IDENTIFIER ':' data_type . ';'
-
-    ';'  shift, and go to state 65
-
-
-State 41
-
-    2 Procedure_dec: PROCEDURE IDENTIFIER . optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';'
-
-    '('  shift, and go to state 66
-
-    $default  reduce using rule 15 (optional_arg_parentheses)
-
-    optional_arg_parentheses  go to state 67
-
-
-State 42
-
     1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN . optional_statement END IDENTIFIER '.'
 
     NEQ            shift, and go to state 23
-    IF             shift, and go to state 68
-    PRINT          shift, and go to state 69
-    PRINTLN        shift, and go to state 70
-    RETURN         shift, and go to state 71
-    WHILE          shift, and go to state 72
-    READ           shift, and go to state 73
-    IDENTIFIER     shift, and go to state 74
+    IF             shift, and go to state 66
+    PRINT          shift, and go to state 67
+    PRINTLN        shift, and go to state 68
+    RETURN         shift, and go to state 69
+    WHILE          shift, and go to state 70
+    READ           shift, and go to state 71
+    IDENTIFIER     shift, and go to state 72
     INT_CONST      shift, and go to state 25
     REAL_CONST     shift, and go to state 26
     STR_CONST      shift, and go to state 27
@@ -696,84 +652,110 @@ State 42
     '~'            shift, and go to state 30
     '('            shift, and go to state 31
 
-    $default  reduce using rule 64 (optional_statement)
-
     const_value            go to state 32
-    statement              go to state 75
-    expression             go to state 76
-    conditional_statement  go to state 77
-    loop_statement         go to state 78
-    optional_statement     go to state 79
-    function_invocation    go to state 80
+    statement              go to state 73
+    expression             go to state 74
+    conditional_statement  go to state 75
+    loop_statement         go to state 76
+    optional_statement     go to state 77
+    function_invocation    go to state 34
 
 
-State 43
+State 38
 
-    7 constants: CONST IDENTIFIER '=' expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
+    8 constants: CONST IDENTIFIER '=' expression . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 81
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 78
 
 
-State 44
+State 39
 
    12 opt_IDENTIFIER: IDENTIFIER ',' opt_IDENTIFIER .
 
     $default  reduce using rule 12 (opt_IDENTIFIER)
 
 
+State 40
+
+   23 data_type: BOOLEAN .
+
+    $default  reduce using rule 23 (data_type)
+
+
+State 41
+
+   22 data_type: INTEGER .
+
+    $default  reduce using rule 22 (data_type)
+
+
+State 42
+
+   24 data_type: REAL .
+
+    $default  reduce using rule 24 (data_type)
+
+
+State 43
+
+   21 data_type: STRING .
+
+    $default  reduce using rule 21 (data_type)
+
+
+State 44
+
+   10 variables: VAR opt_IDENTIFIER ':' data_type . ';'
+
+    ';'  shift, and go to state 79
+
+
 State 45
 
-    9 variables: VAR opt_IDENTIFIER ':' data_type . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   51           | NEQ expression .
+   53           | expression . AND expression
+   54           | expression . OR expression
 
-    ';'  shift, and go to state 82
+    AND  shift, and go to state 51
+    OR   shift, and go to state 52
+
+    $default  reduce using rule 51 (expression)
 
 
 State 46
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   52           | NEQ expression .
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND  shift, and go to state 52
-    OR   shift, and go to state 53
-
-    $default  reduce using rule 52 (expression)
-
-
-State 47
-
-   56 expression: IDENTIFIER '[' . expression ']'
+   55 expression: IDENTIFIER '[' . expression ']'
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -786,13 +768,13 @@ State 47
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 83
+    expression           go to state 80
     function_invocation  go to state 34
 
 
-State 48
+State 47
 
-   65 function_invocation: IDENTIFIER '(' . optional_comma_separated_expression ')'
+   63 function_invocation: IDENTIFIER '(' . optional_comma_separated_expression ')'
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -805,82 +787,139 @@ State 48
     '('            shift, and go to state 31
 
     const_value                          go to state 32
-    expression                           go to state 84
+    expression                           go to state 81
     function_invocation                  go to state 34
-    optional_comma_separated_expression  go to state 85
+    optional_comma_separated_expression  go to state 82
+
+
+State 48
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   57           | '-' expression .
+
+    $default  reduce using rule 57 (expression)
 
 
 State 49
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   58           | '-' expression .
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   52           | '~' expression .
+   53           | expression . AND expression
+   54           | expression . OR expression
 
-    $default  reduce using rule 58 (expression)
+    AND  shift, and go to state 51
+    OR   shift, and go to state 52
+
+    $default  reduce using rule 52 (expression)
 
 
 State 50
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   53           | '~' expression .
-   54           | expression . AND expression
-   55           | expression . OR expression
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   56           | '(' expression . ')'
 
-    AND  shift, and go to state 52
-    OR   shift, and go to state 53
-
-    $default  reduce using rule 53 (expression)
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ')'    shift, and go to state 83
 
 
 State 51
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   57           | '(' expression . ')'
+   53 expression: expression AND . expression
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ')'    shift, and go to state 86
+    NEQ            shift, and go to state 23
+    IDENTIFIER     shift, and go to state 24
+    INT_CONST      shift, and go to state 25
+    REAL_CONST     shift, and go to state 26
+    STR_CONST      shift, and go to state 27
+    BOOLEAN_CONST  shift, and go to state 28
+    '-'            shift, and go to state 29
+    '~'            shift, and go to state 30
+    '('            shift, and go to state 31
+
+    const_value          go to state 32
+    expression           go to state 84
+    function_invocation  go to state 34
 
 
 State 52
 
-   54 expression: expression AND . expression
+   54 expression: expression OR . expression
+
+    NEQ            shift, and go to state 23
+    IDENTIFIER     shift, and go to state 24
+    INT_CONST      shift, and go to state 25
+    REAL_CONST     shift, and go to state 26
+    STR_CONST      shift, and go to state 27
+    BOOLEAN_CONST  shift, and go to state 28
+    '-'            shift, and go to state 29
+    '~'            shift, and go to state 30
+    '('            shift, and go to state 31
+
+    const_value          go to state 32
+    expression           go to state 85
+    function_invocation  go to state 34
+
+
+State 53
+
+   49 expression: expression LE_EQ . expression
+
+    NEQ            shift, and go to state 23
+    IDENTIFIER     shift, and go to state 24
+    INT_CONST      shift, and go to state 25
+    REAL_CONST     shift, and go to state 26
+    STR_CONST      shift, and go to state 27
+    BOOLEAN_CONST  shift, and go to state 28
+    '-'            shift, and go to state 29
+    '~'            shift, and go to state 30
+    '('            shift, and go to state 31
+
+    const_value          go to state 32
+    expression           go to state 86
+    function_invocation  go to state 34
+
+
+State 54
+
+   50 expression: expression GR_EQ . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -897,9 +936,9 @@ State 52
     function_invocation  go to state 34
 
 
-State 53
+State 55
 
-   55 expression: expression OR . expression
+   42 expression: expression '*' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -916,9 +955,9 @@ State 53
     function_invocation  go to state 34
 
 
-State 54
+State 56
 
-   50 expression: expression LE_EQ . expression
+   43 expression: expression '/' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -935,9 +974,9 @@ State 54
     function_invocation  go to state 34
 
 
-State 55
+State 57
 
-   51 expression: expression GR_EQ . expression
+   44 expression: expression '+' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -954,9 +993,9 @@ State 55
     function_invocation  go to state 34
 
 
-State 56
+State 58
 
-   43 expression: expression '*' . expression
+   45 expression: expression '-' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -973,9 +1012,9 @@ State 56
     function_invocation  go to state 34
 
 
-State 57
+State 59
 
-   44 expression: expression '/' . expression
+   46 expression: expression '<' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -992,9 +1031,9 @@ State 57
     function_invocation  go to state 34
 
 
-State 58
+State 60
 
-   45 expression: expression '+' . expression
+   48 expression: expression '=' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -1011,9 +1050,9 @@ State 58
     function_invocation  go to state 34
 
 
-State 59
+State 61
 
-   46 expression: expression '-' . expression
+   47 expression: expression '>' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -1030,115 +1069,52 @@ State 59
     function_invocation  go to state 34
 
 
-State 60
-
-   47 expression: expression '<' . expression
-
-    NEQ            shift, and go to state 23
-    IDENTIFIER     shift, and go to state 24
-    INT_CONST      shift, and go to state 25
-    REAL_CONST     shift, and go to state 26
-    STR_CONST      shift, and go to state 27
-    BOOLEAN_CONST  shift, and go to state 28
-    '-'            shift, and go to state 29
-    '~'            shift, and go to state 30
-    '('            shift, and go to state 31
-
-    const_value          go to state 32
-    expression           go to state 95
-    function_invocation  go to state 34
-
-
-State 61
-
-   49 expression: expression '=' . expression
-
-    NEQ            shift, and go to state 23
-    IDENTIFIER     shift, and go to state 24
-    INT_CONST      shift, and go to state 25
-    REAL_CONST     shift, and go to state 26
-    STR_CONST      shift, and go to state 27
-    BOOLEAN_CONST  shift, and go to state 28
-    '-'            shift, and go to state 29
-    '~'            shift, and go to state 30
-    '('            shift, and go to state 31
-
-    const_value          go to state 32
-    expression           go to state 96
-    function_invocation  go to state 34
-
-
 State 62
 
-   48 expression: expression '>' . expression
+    9 constants: IDENTIFIER '=' expression ';' .
 
-    NEQ            shift, and go to state 23
-    IDENTIFIER     shift, and go to state 24
-    INT_CONST      shift, and go to state 25
-    REAL_CONST     shift, and go to state 26
-    STR_CONST      shift, and go to state 27
-    BOOLEAN_CONST  shift, and go to state 28
-    '-'            shift, and go to state 29
-    '~'            shift, and go to state 30
-    '('            shift, and go to state 31
-
-    const_value          go to state 32
-    expression           go to state 97
-    function_invocation  go to state 34
+    $default  reduce using rule 9 (constants)
 
 
 State 63
 
-    8 constants: IDENTIFIER '=' expression ';' .
+   11 variables: IDENTIFIER ':' ARRAY '[' . INT_CONST ',' INT_CONST ']' OF data_type ';'
 
-    $default  reduce using rule 8 (constants)
+    INT_CONST  shift, and go to state 95
 
 
 State 64
 
-   11 variables: IDENTIFIER ':' ARRAY '[' . INT_CONST ',' INT_CONST ']' OF data_type ';'
+   14 optional_arg_parentheses: '(' . optional_arguments ')'
 
-    INT_CONST  shift, and go to state 98
+    IDENTIFIER  shift, and go to state 96
+
+    $default  reduce using rule 18 (optional_arguments)
+
+    optional_arguments  go to state 97
 
 
 State 65
 
-   10 variables: IDENTIFIER ':' data_type ';' .
+    2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses . opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';'
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses . opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' Procedure_dec
 
-    $default  reduce using rule 10 (variables)
+    ':'  shift, and go to state 98
+
+    $default  reduce using rule 20 (opt_func_type)
+
+    opt_func_type  go to state 99
 
 
 State 66
 
-   14 optional_arg_parentheses: '(' . optional_arguments ')'
+   58 conditional_statement: IF . '(' expression ')' THEN optional_statement ELSE optional_statement END ';'
+   59                      | IF . '(' expression ')' THEN optional_statement END ';'
 
-    IDENTIFIER  shift, and go to state 99
-
-    $default  reduce using rule 18 (optional_arguments)
-
-    optional_arguments  go to state 100
+    '('  shift, and go to state 100
 
 
 State 67
-
-    2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses . opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';'
-
-    ':'  shift, and go to state 101
-
-    $default  reduce using rule 20 (opt_func_type)
-
-    opt_func_type  go to state 102
-
-
-State 68
-
-   59 conditional_statement: IF . '(' expression ')' THEN optional_statement ELSE optional_statement END ';'
-   60                      | IF . '(' expression ')' THEN optional_statement END ';'
-
-    '('  shift, and go to state 103
-
-
-State 69
 
    31 statement: PRINT . expression ';'
 
@@ -1153,11 +1129,11 @@ State 69
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 104
+    expression           go to state 101
     function_invocation  go to state 34
 
 
-State 70
+State 68
 
    32 statement: PRINTLN . expression ';'
 
@@ -1172,11 +1148,11 @@ State 70
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 105
+    expression           go to state 102
     function_invocation  go to state 34
 
 
-State 71
+State 69
 
    34 statement: RETURN . ';'
    35          | RETURN . expression ';'
@@ -1189,56 +1165,56 @@ State 71
     BOOLEAN_CONST  shift, and go to state 28
     '-'            shift, and go to state 29
     '~'            shift, and go to state 30
-    ';'            shift, and go to state 106
+    ';'            shift, and go to state 103
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 107
+    expression           go to state 104
     function_invocation  go to state 34
+
+
+State 70
+
+   60 loop_statement: WHILE . '(' expression ')' DO optional_statement END ';'
+
+    '('  shift, and go to state 105
+
+
+State 71
+
+   33 statement: READ . IDENTIFIER ';'
+
+    IDENTIFIER  shift, and go to state 106
 
 
 State 72
 
-   61 loop_statement: WHILE . '(' expression ')' DO optional_statement END ';'
+   29 statement: IDENTIFIER . EQ expression ';'
+   30          | IDENTIFIER . '[' expression ']' EQ expression ';'
+   39 expression: IDENTIFIER .
+   55           | IDENTIFIER . '[' expression ']'
+   63 function_invocation: IDENTIFIER . '(' optional_comma_separated_expression ')'
 
-    '('  shift, and go to state 108
+    EQ   shift, and go to state 107
+    '['  shift, and go to state 108
+    '('  shift, and go to state 47
+
+    $default  reduce using rule 39 (expression)
 
 
 State 73
 
-   33 statement: READ . IDENTIFIER ';'
-
-    IDENTIFIER  shift, and go to state 109
-
-
-State 74
-
-   29 statement: IDENTIFIER . EQ expression ';'
-   30          | IDENTIFIER . '[' expression ']' EQ expression ';'
-   40 expression: IDENTIFIER .
-   56           | IDENTIFIER . '[' expression ']'
-   65 function_invocation: IDENTIFIER . '(' optional_comma_separated_expression ')'
-
-    EQ   shift, and go to state 110
-    '['  shift, and go to state 111
-    '('  shift, and go to state 48
-
-    $default  reduce using rule 40 (expression)
-
-
-State 75
-
-   62 optional_statement: statement . optional_statement
-   63                   | statement .
+   61 optional_statement: statement . optional_statement
+   62                   | statement .
 
     NEQ            shift, and go to state 23
-    IF             shift, and go to state 68
-    PRINT          shift, and go to state 69
-    PRINTLN        shift, and go to state 70
-    RETURN         shift, and go to state 71
-    WHILE          shift, and go to state 72
-    READ           shift, and go to state 73
-    IDENTIFIER     shift, and go to state 74
+    IF             shift, and go to state 66
+    PRINT          shift, and go to state 67
+    PRINTLN        shift, and go to state 68
+    RETURN         shift, and go to state 69
+    WHILE          shift, and go to state 70
+    READ           shift, and go to state 71
+    IDENTIFIER     shift, and go to state 72
     INT_CONST      shift, and go to state 25
     REAL_CONST     shift, and go to state 26
     STR_CONST      shift, and go to state 27
@@ -1247,476 +1223,575 @@ State 75
     '~'            shift, and go to state 30
     '('            shift, and go to state 31
 
-    ELSE      reduce using rule 63 (optional_statement)
-    ELSE      [reduce using rule 64 (optional_statement)]
-    END       reduce using rule 63 (optional_statement)
-    END       [reduce using rule 64 (optional_statement)]
-    $default  reduce using rule 63 (optional_statement)
+    $default  reduce using rule 62 (optional_statement)
 
     const_value            go to state 32
-    statement              go to state 75
-    expression             go to state 76
-    conditional_statement  go to state 77
-    loop_statement         go to state 78
-    optional_statement     go to state 112
-    function_invocation    go to state 80
+    statement              go to state 73
+    expression             go to state 74
+    conditional_statement  go to state 75
+    loop_statement         go to state 76
+    optional_statement     go to state 109
+    function_invocation    go to state 34
+
+
+State 74
+
+   36 statement: expression . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 110
+
+
+State 75
+
+   37 statement: conditional_statement .
+
+    $default  reduce using rule 37 (statement)
 
 
 State 76
 
-   37 statement: expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 113
-
-
-State 77
-
-   38 statement: conditional_statement .
+   38 statement: loop_statement .
 
     $default  reduce using rule 38 (statement)
 
 
+State 77
+
+    1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement . END IDENTIFIER '.'
+
+    END  shift, and go to state 111
+
+
 State 78
 
-   39 statement: loop_statement .
+    8 constants: CONST IDENTIFIER '=' expression ';' .
 
-    $default  reduce using rule 39 (statement)
+    $default  reduce using rule 8 (constants)
 
 
 State 79
 
-    1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement . END IDENTIFIER '.'
+   10 variables: VAR opt_IDENTIFIER ':' data_type ';' .
 
-    END  shift, and go to state 114
+    $default  reduce using rule 10 (variables)
 
 
 State 80
 
-   36 statement: function_invocation . ';'
-   42 expression: function_invocation .
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   55           | IDENTIFIER '[' expression . ']'
 
-    ';'  shift, and go to state 115
-
-    ';'       [reduce using rule 42 (expression)]
-    $default  reduce using rule 42 (expression)
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ']'    shift, and go to state 112
 
 
 State 81
 
-    7 constants: CONST IDENTIFIER '=' expression ';' .
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   64 optional_comma_separated_expression: expression .
 
-    $default  reduce using rule 7 (constants)
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+
+    $default  reduce using rule 64 (optional_comma_separated_expression)
 
 
 State 82
 
-    9 variables: VAR opt_IDENTIFIER ':' data_type ';' .
+   63 function_invocation: IDENTIFIER '(' optional_comma_separated_expression . ')'
+   65 optional_comma_separated_expression: optional_comma_separated_expression . ',' expression
 
-    $default  reduce using rule 9 (variables)
+    ','  shift, and go to state 113
+    ')'  shift, and go to state 114
 
 
 State 83
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   56           | IDENTIFIER '[' expression . ']'
+   56 expression: '(' expression ')' .
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ']'    shift, and go to state 116
+    $default  reduce using rule 56 (expression)
 
 
 State 84
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   66 optional_comma_separated_expression: expression .
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   53           | expression AND expression .
+   54           | expression . OR expression
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
+    OR  shift, and go to state 52
 
-    $default  reduce using rule 66 (optional_comma_separated_expression)
+    $default  reduce using rule 53 (expression)
 
 
 State 85
 
-   65 function_invocation: IDENTIFIER '(' optional_comma_separated_expression . ')'
-   67 optional_comma_separated_expression: optional_comma_separated_expression . ',' expression
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   54           | expression OR expression .
+
+    $default  reduce using rule 54 (expression)
+
+
+State 86
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   49           | expression LE_EQ expression .
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND  shift, and go to state 51
+    OR   shift, and go to state 52
+
+    $default  reduce using rule 49 (expression)
+
+
+State 87
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   50           | expression GR_EQ expression .
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND  shift, and go to state 51
+    OR   shift, and go to state 52
+
+    $default  reduce using rule 50 (expression)
+
+
+State 88
+
+   42 expression: expression . '*' expression
+   42           | expression '*' expression .
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+
+    $default  reduce using rule 42 (expression)
+
+
+State 89
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   43           | expression '/' expression .
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+
+    $default  reduce using rule 43 (expression)
+
+
+State 90
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   44           | expression '+' expression .
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+
+    $default  reduce using rule 44 (expression)
+
+
+State 91
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   45           | expression '-' expression .
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+
+    $default  reduce using rule 45 (expression)
+
+
+State 92
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   46           | expression '<' expression .
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND  shift, and go to state 51
+    OR   shift, and go to state 52
+
+    $default  reduce using rule 46 (expression)
+
+
+State 93
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   48           | expression '=' expression .
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND  shift, and go to state 51
+    OR   shift, and go to state 52
+
+    $default  reduce using rule 48 (expression)
+
+
+State 94
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   47           | expression '>' expression .
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND  shift, and go to state 51
+    OR   shift, and go to state 52
+
+    $default  reduce using rule 47 (expression)
+
+
+State 95
+
+   11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST . ',' INT_CONST ']' OF data_type ';'
+
+    ','  shift, and go to state 115
+
+
+State 96
+
+   16 optional_arguments: IDENTIFIER . ':' data_type
+
+    ':'  shift, and go to state 116
+
+
+State 97
+
+   14 optional_arg_parentheses: '(' optional_arguments . ')'
+   17 optional_arguments: optional_arguments . ',' IDENTIFIER ':' data_type
 
     ','  shift, and go to state 117
     ')'  shift, and go to state 118
 
 
-State 86
-
-   57 expression: '(' expression ')' .
-
-    $default  reduce using rule 57 (expression)
-
-
-State 87
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   54           | expression AND expression .
-   55           | expression . OR expression
-
-    OR  shift, and go to state 53
-
-    $default  reduce using rule 54 (expression)
-
-
-State 88
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   55           | expression OR expression .
-
-    $default  reduce using rule 55 (expression)
-
-
-State 89
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   50           | expression LE_EQ expression .
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND  shift, and go to state 52
-    OR   shift, and go to state 53
-
-    $default  reduce using rule 50 (expression)
-
-
-State 90
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   51           | expression GR_EQ expression .
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND  shift, and go to state 52
-    OR   shift, and go to state 53
-
-    $default  reduce using rule 51 (expression)
-
-
-State 91
-
-   43 expression: expression . '*' expression
-   43           | expression '*' expression .
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-
-    $default  reduce using rule 43 (expression)
-
-
-State 92
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   44           | expression '/' expression .
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-
-    $default  reduce using rule 44 (expression)
-
-
-State 93
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   45           | expression '+' expression .
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-
-    $default  reduce using rule 45 (expression)
-
-
-State 94
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   46           | expression '-' expression .
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-
-    $default  reduce using rule 46 (expression)
-
-
-State 95
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   47           | expression '<' expression .
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND  shift, and go to state 52
-    OR   shift, and go to state 53
-
-    $default  reduce using rule 47 (expression)
-
-
-State 96
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   49           | expression '=' expression .
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND  shift, and go to state 52
-    OR   shift, and go to state 53
-
-    $default  reduce using rule 49 (expression)
-
-
-State 97
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   48           | expression '>' expression .
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND  shift, and go to state 52
-    OR   shift, and go to state 53
-
-    $default  reduce using rule 48 (expression)
-
-
 State 98
 
-   11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST . ',' INT_CONST ']' OF data_type ';'
+   19 opt_func_type: ':' . data_type
 
-    ','  shift, and go to state 119
+    BOOLEAN  shift, and go to state 40
+    INTEGER  shift, and go to state 41
+    REAL     shift, and go to state 42
+    STRING   shift, and go to state 43
+
+    data_type  go to state 119
 
 
 State 99
 
-   16 optional_arguments: IDENTIFIER . ':' data_type
-
-    ':'  shift, and go to state 120
-
-
-State 100
-
-   14 optional_arg_parentheses: '(' optional_arguments . ')'
-   17 optional_arguments: optional_arguments . ',' IDENTIFIER ':' data_type
-
-    ','  shift, and go to state 121
-    ')'  shift, and go to state 122
-
-
-State 101
-
-   19 opt_func_type: ':' . data_type
-
-    BOOLEAN  shift, and go to state 36
-    INTEGER  shift, and go to state 37
-    REAL     shift, and go to state 38
-    STRING   shift, and go to state 39
-
-    data_type  go to state 123
-
-
-State 102
-
     2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type . optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';'
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type . optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' Procedure_dec
 
     CONST       shift, and go to state 5
     VAR         shift, and go to state 6
     IDENTIFIER  shift, and go to state 7
 
-    $default  reduce using rule 6 (optional_var_con_declaration)
+    $default  reduce using rule 7 (optional_var_con_declaration)
 
-    optional_var_con_declaration  go to state 124
+    optional_var_con_declaration  go to state 120
     constants                     go to state 9
     variables                     go to state 10
 
 
+State 100
+
+   58 conditional_statement: IF '(' . expression ')' THEN optional_statement ELSE optional_statement END ';'
+   59                      | IF '(' . expression ')' THEN optional_statement END ';'
+
+    NEQ            shift, and go to state 23
+    IDENTIFIER     shift, and go to state 24
+    INT_CONST      shift, and go to state 25
+    REAL_CONST     shift, and go to state 26
+    STR_CONST      shift, and go to state 27
+    BOOLEAN_CONST  shift, and go to state 28
+    '-'            shift, and go to state 29
+    '~'            shift, and go to state 30
+    '('            shift, and go to state 31
+
+    const_value          go to state 32
+    expression           go to state 121
+    function_invocation  go to state 34
+
+
+State 101
+
+   31 statement: PRINT expression . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 122
+
+
+State 102
+
+   32 statement: PRINTLN expression . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 123
+
+
 State 103
 
-   59 conditional_statement: IF '(' . expression ')' THEN optional_statement ELSE optional_statement END ';'
-   60                      | IF '(' . expression ')' THEN optional_statement END ';'
+   34 statement: RETURN ';' .
+
+    $default  reduce using rule 34 (statement)
+
+
+State 104
+
+   35 statement: RETURN expression . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 124
+
+
+State 105
+
+   60 loop_statement: WHILE '(' . expression ')' DO optional_statement END ';'
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -1733,127 +1808,14 @@ State 103
     function_invocation  go to state 34
 
 
-State 104
-
-   31 statement: PRINT expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 126
-
-
-State 105
-
-   32 statement: PRINTLN expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 127
-
-
 State 106
-
-   34 statement: RETURN ';' .
-
-    $default  reduce using rule 34 (statement)
-
-
-State 107
-
-   35 statement: RETURN expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 128
-
-
-State 108
-
-   61 loop_statement: WHILE '(' . expression ')' DO optional_statement END ';'
-
-    NEQ            shift, and go to state 23
-    IDENTIFIER     shift, and go to state 24
-    INT_CONST      shift, and go to state 25
-    REAL_CONST     shift, and go to state 26
-    STR_CONST      shift, and go to state 27
-    BOOLEAN_CONST  shift, and go to state 28
-    '-'            shift, and go to state 29
-    '~'            shift, and go to state 30
-    '('            shift, and go to state 31
-
-    const_value          go to state 32
-    expression           go to state 129
-    function_invocation  go to state 34
-
-
-State 109
 
    33 statement: READ IDENTIFIER . ';'
 
-    ';'  shift, and go to state 130
+    ';'  shift, and go to state 126
 
 
-State 110
+State 107
 
    29 statement: IDENTIFIER EQ . expression ';'
 
@@ -1868,14 +1830,14 @@ State 110
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 131
+    expression           go to state 127
     function_invocation  go to state 34
 
 
-State 111
+State 108
 
    30 statement: IDENTIFIER '[' . expression ']' EQ expression ';'
-   56 expression: IDENTIFIER '[' . expression ']'
+   55 expression: IDENTIFIER '[' . expression ']'
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -1888,48 +1850,41 @@ State 111
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 132
+    expression           go to state 128
     function_invocation  go to state 34
 
 
-State 112
+State 109
 
-   62 optional_statement: statement optional_statement .
+   61 optional_statement: statement optional_statement .
 
-    $default  reduce using rule 62 (optional_statement)
-
-
-State 113
-
-   37 statement: expression ';' .
-
-    $default  reduce using rule 37 (statement)
+    $default  reduce using rule 61 (optional_statement)
 
 
-State 114
+State 110
 
-    1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END . IDENTIFIER '.'
-
-    IDENTIFIER  shift, and go to state 133
-
-
-State 115
-
-   36 statement: function_invocation ';' .
+   36 statement: expression ';' .
 
     $default  reduce using rule 36 (statement)
 
 
-State 116
+State 111
 
-   56 expression: IDENTIFIER '[' expression ']' .
+    1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END . IDENTIFIER '.'
 
-    $default  reduce using rule 56 (expression)
+    IDENTIFIER  shift, and go to state 129
 
 
-State 117
+State 112
 
-   67 optional_comma_separated_expression: optional_comma_separated_expression ',' . expression
+   55 expression: IDENTIFIER '[' expression ']' .
+
+    $default  reduce using rule 55 (expression)
+
+
+State 113
+
+   65 optional_comma_separated_expression: optional_comma_separated_expression ',' . expression
 
     NEQ            shift, and go to state 23
     IDENTIFIER     shift, and go to state 24
@@ -1942,280 +1897,282 @@ State 117
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 134
+    expression           go to state 130
     function_invocation  go to state 34
 
 
-State 118
+State 114
 
-   65 function_invocation: IDENTIFIER '(' optional_comma_separated_expression ')' .
+   63 function_invocation: IDENTIFIER '(' optional_comma_separated_expression ')' .
 
-    $default  reduce using rule 65 (function_invocation)
+    $default  reduce using rule 63 (function_invocation)
 
 
-State 119
+State 115
 
    11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST ',' . INT_CONST ']' OF data_type ';'
 
-    INT_CONST  shift, and go to state 135
+    INT_CONST  shift, and go to state 131
 
 
-State 120
+State 116
 
    16 optional_arguments: IDENTIFIER ':' . data_type
 
-    BOOLEAN  shift, and go to state 36
-    INTEGER  shift, and go to state 37
-    REAL     shift, and go to state 38
-    STRING   shift, and go to state 39
+    BOOLEAN  shift, and go to state 40
+    INTEGER  shift, and go to state 41
+    REAL     shift, and go to state 42
+    STRING   shift, and go to state 43
 
-    data_type  go to state 136
+    data_type  go to state 132
 
 
-State 121
+State 117
 
    17 optional_arguments: optional_arguments ',' . IDENTIFIER ':' data_type
 
-    IDENTIFIER  shift, and go to state 137
+    IDENTIFIER  shift, and go to state 133
 
 
-State 122
+State 118
 
    14 optional_arg_parentheses: '(' optional_arguments ')' .
 
     $default  reduce using rule 14 (optional_arg_parentheses)
 
 
-State 123
+State 119
 
    19 opt_func_type: ':' data_type .
 
     $default  reduce using rule 19 (opt_func_type)
 
 
-State 124
+State 120
 
     2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration . _BEGIN optional_statement END IDENTIFIER ';'
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration . _BEGIN optional_statement END IDENTIFIER ';' Procedure_dec
 
-    _BEGIN  shift, and go to state 138
-
-
-State 125
-
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   59 conditional_statement: IF '(' expression . ')' THEN optional_statement ELSE optional_statement END ';'
-   60                      | IF '(' expression . ')' THEN optional_statement END ';'
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ')'    shift, and go to state 139
+    _BEGIN  shift, and go to state 134
 
 
-State 126
+State 121
+
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   58 conditional_statement: IF '(' expression . ')' THEN optional_statement ELSE optional_statement END ';'
+   59                      | IF '(' expression . ')' THEN optional_statement END ';'
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ')'    shift, and go to state 135
+
+
+State 122
 
    31 statement: PRINT expression ';' .
 
     $default  reduce using rule 31 (statement)
 
 
-State 127
+State 123
 
    32 statement: PRINTLN expression ';' .
 
     $default  reduce using rule 32 (statement)
 
 
-State 128
+State 124
 
    35 statement: RETURN expression ';' .
 
     $default  reduce using rule 35 (statement)
 
 
-State 129
+State 125
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   61 loop_statement: WHILE '(' expression . ')' DO optional_statement END ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   60 loop_statement: WHILE '(' expression . ')' DO optional_statement END ';'
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ')'    shift, and go to state 140
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ')'    shift, and go to state 136
 
 
-State 130
+State 126
 
    33 statement: READ IDENTIFIER ';' .
 
     $default  reduce using rule 33 (statement)
 
 
-State 131
+State 127
 
    29 statement: IDENTIFIER EQ expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 141
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 137
 
 
-State 132
+State 128
 
    30 statement: IDENTIFIER '[' expression . ']' EQ expression ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   56           | IDENTIFIER '[' expression . ']'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   55           | IDENTIFIER '[' expression . ']'
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ']'    shift, and go to state 142
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ']'    shift, and go to state 138
 
 
-State 133
+State 129
 
     1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END IDENTIFIER . '.'
 
-    '.'  shift, and go to state 143
+    '.'  shift, and go to state 139
 
 
-State 134
+State 130
 
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-   67 optional_comma_separated_expression: optional_comma_separated_expression ',' expression .
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+   65 optional_comma_separated_expression: optional_comma_separated_expression ',' expression .
 
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
 
-    $default  reduce using rule 67 (optional_comma_separated_expression)
+    $default  reduce using rule 65 (optional_comma_separated_expression)
 
 
-State 135
+State 131
 
    11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST . ']' OF data_type ';'
 
-    ']'  shift, and go to state 144
+    ']'  shift, and go to state 140
 
 
-State 136
+State 132
 
    16 optional_arguments: IDENTIFIER ':' data_type .
 
     $default  reduce using rule 16 (optional_arguments)
 
 
-State 137
+State 133
 
    17 optional_arguments: optional_arguments ',' IDENTIFIER . ':' data_type
 
-    ':'  shift, and go to state 145
+    ':'  shift, and go to state 141
 
 
-State 138
+State 134
 
     2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN . optional_statement END IDENTIFIER ';'
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN . optional_statement END IDENTIFIER ';' Procedure_dec
 
     NEQ            shift, and go to state 23
-    IF             shift, and go to state 68
-    PRINT          shift, and go to state 69
-    PRINTLN        shift, and go to state 70
-    RETURN         shift, and go to state 71
-    WHILE          shift, and go to state 72
-    READ           shift, and go to state 73
-    IDENTIFIER     shift, and go to state 74
+    IF             shift, and go to state 66
+    PRINT          shift, and go to state 67
+    PRINTLN        shift, and go to state 68
+    RETURN         shift, and go to state 69
+    WHILE          shift, and go to state 70
+    READ           shift, and go to state 71
+    IDENTIFIER     shift, and go to state 72
     INT_CONST      shift, and go to state 25
     REAL_CONST     shift, and go to state 26
     STR_CONST      shift, and go to state 27
@@ -2224,95 +2181,94 @@ State 138
     '~'            shift, and go to state 30
     '('            shift, and go to state 31
 
-    $default  reduce using rule 64 (optional_statement)
-
     const_value            go to state 32
-    statement              go to state 75
-    expression             go to state 76
-    conditional_statement  go to state 77
-    loop_statement         go to state 78
-    optional_statement     go to state 146
-    function_invocation    go to state 80
+    statement              go to state 73
+    expression             go to state 74
+    conditional_statement  go to state 75
+    loop_statement         go to state 76
+    optional_statement     go to state 142
+    function_invocation    go to state 34
 
 
-State 139
+State 135
 
-   59 conditional_statement: IF '(' expression ')' . THEN optional_statement ELSE optional_statement END ';'
-   60                      | IF '(' expression ')' . THEN optional_statement END ';'
+   58 conditional_statement: IF '(' expression ')' . THEN optional_statement ELSE optional_statement END ';'
+   59                      | IF '(' expression ')' . THEN optional_statement END ';'
 
-    THEN  shift, and go to state 147
-
-
-State 140
-
-   61 loop_statement: WHILE '(' expression ')' . DO optional_statement END ';'
-
-    DO  shift, and go to state 148
+    THEN  shift, and go to state 143
 
 
-State 141
+State 136
+
+   60 loop_statement: WHILE '(' expression ')' . DO optional_statement END ';'
+
+    DO  shift, and go to state 144
+
+
+State 137
 
    29 statement: IDENTIFIER EQ expression ';' .
 
     $default  reduce using rule 29 (statement)
 
 
-State 142
+State 138
 
    30 statement: IDENTIFIER '[' expression ']' . EQ expression ';'
-   56 expression: IDENTIFIER '[' expression ']' .
+   55 expression: IDENTIFIER '[' expression ']' .
 
-    EQ  shift, and go to state 149
+    EQ  shift, and go to state 145
 
-    $default  reduce using rule 56 (expression)
+    $default  reduce using rule 55 (expression)
 
 
-State 143
+State 139
 
     1 program: MODULE IDENTIFIER optional_var_con_declaration Procedure_dec _BEGIN optional_statement END IDENTIFIER '.' .
 
     $default  reduce using rule 1 (program)
 
 
-State 144
+State 140
 
    11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' . OF data_type ';'
 
-    OF  shift, and go to state 150
+    OF  shift, and go to state 146
 
 
-State 145
+State 141
 
    17 optional_arguments: optional_arguments ',' IDENTIFIER ':' . data_type
 
-    BOOLEAN  shift, and go to state 36
-    INTEGER  shift, and go to state 37
-    REAL     shift, and go to state 38
-    STRING   shift, and go to state 39
+    BOOLEAN  shift, and go to state 40
+    INTEGER  shift, and go to state 41
+    REAL     shift, and go to state 42
+    STRING   shift, and go to state 43
 
-    data_type  go to state 151
+    data_type  go to state 147
 
 
-State 146
+State 142
 
     2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement . END IDENTIFIER ';'
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement . END IDENTIFIER ';' Procedure_dec
 
-    END  shift, and go to state 152
+    END  shift, and go to state 148
 
 
-State 147
+State 143
 
-   59 conditional_statement: IF '(' expression ')' THEN . optional_statement ELSE optional_statement END ';'
-   60                      | IF '(' expression ')' THEN . optional_statement END ';'
+   58 conditional_statement: IF '(' expression ')' THEN . optional_statement ELSE optional_statement END ';'
+   59                      | IF '(' expression ')' THEN . optional_statement END ';'
 
     NEQ            shift, and go to state 23
-    IF             shift, and go to state 68
-    PRINT          shift, and go to state 69
-    PRINTLN        shift, and go to state 70
-    RETURN         shift, and go to state 71
-    WHILE          shift, and go to state 72
-    READ           shift, and go to state 73
-    IDENTIFIER     shift, and go to state 74
+    IF             shift, and go to state 66
+    PRINT          shift, and go to state 67
+    PRINTLN        shift, and go to state 68
+    RETURN         shift, and go to state 69
+    WHILE          shift, and go to state 70
+    READ           shift, and go to state 71
+    IDENTIFIER     shift, and go to state 72
     INT_CONST      shift, and go to state 25
     REAL_CONST     shift, and go to state 26
     STR_CONST      shift, and go to state 27
@@ -2321,29 +2277,27 @@ State 147
     '~'            shift, and go to state 30
     '('            shift, and go to state 31
 
-    $default  reduce using rule 64 (optional_statement)
-
     const_value            go to state 32
-    statement              go to state 75
-    expression             go to state 76
-    conditional_statement  go to state 77
-    loop_statement         go to state 78
-    optional_statement     go to state 153
-    function_invocation    go to state 80
+    statement              go to state 73
+    expression             go to state 74
+    conditional_statement  go to state 75
+    loop_statement         go to state 76
+    optional_statement     go to state 149
+    function_invocation    go to state 34
 
 
-State 148
+State 144
 
-   61 loop_statement: WHILE '(' expression ')' DO . optional_statement END ';'
+   60 loop_statement: WHILE '(' expression ')' DO . optional_statement END ';'
 
     NEQ            shift, and go to state 23
-    IF             shift, and go to state 68
-    PRINT          shift, and go to state 69
-    PRINTLN        shift, and go to state 70
-    RETURN         shift, and go to state 71
-    WHILE          shift, and go to state 72
-    READ           shift, and go to state 73
-    IDENTIFIER     shift, and go to state 74
+    IF             shift, and go to state 66
+    PRINT          shift, and go to state 67
+    PRINTLN        shift, and go to state 68
+    RETURN         shift, and go to state 69
+    WHILE          shift, and go to state 70
+    READ           shift, and go to state 71
+    IDENTIFIER     shift, and go to state 72
     INT_CONST      shift, and go to state 25
     REAL_CONST     shift, and go to state 26
     STR_CONST      shift, and go to state 27
@@ -2352,18 +2306,16 @@ State 148
     '~'            shift, and go to state 30
     '('            shift, and go to state 31
 
-    $default  reduce using rule 64 (optional_statement)
-
     const_value            go to state 32
-    statement              go to state 75
-    expression             go to state 76
-    conditional_statement  go to state 77
-    loop_statement         go to state 78
-    optional_statement     go to state 154
-    function_invocation    go to state 80
+    statement              go to state 73
+    expression             go to state 74
+    conditional_statement  go to state 75
+    loop_statement         go to state 76
+    optional_statement     go to state 150
+    function_invocation    go to state 34
 
 
-State 149
+State 145
 
    30 statement: IDENTIFIER '[' expression ']' EQ . expression ';'
 
@@ -2378,107 +2330,109 @@ State 149
     '('            shift, and go to state 31
 
     const_value          go to state 32
-    expression           go to state 155
+    expression           go to state 151
     function_invocation  go to state 34
 
 
-State 150
+State 146
 
    11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF . data_type ';'
 
-    BOOLEAN  shift, and go to state 36
-    INTEGER  shift, and go to state 37
-    REAL     shift, and go to state 38
-    STRING   shift, and go to state 39
+    BOOLEAN  shift, and go to state 40
+    INTEGER  shift, and go to state 41
+    REAL     shift, and go to state 42
+    STRING   shift, and go to state 43
 
-    data_type  go to state 156
+    data_type  go to state 152
 
 
-State 151
+State 147
 
    17 optional_arguments: optional_arguments ',' IDENTIFIER ':' data_type .
 
     $default  reduce using rule 17 (optional_arguments)
 
 
-State 152
+State 148
 
     2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END . IDENTIFIER ';'
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END . IDENTIFIER ';' Procedure_dec
 
-    IDENTIFIER  shift, and go to state 157
+    IDENTIFIER  shift, and go to state 153
+
+
+State 149
+
+   58 conditional_statement: IF '(' expression ')' THEN optional_statement . ELSE optional_statement END ';'
+   59                      | IF '(' expression ')' THEN optional_statement . END ';'
+
+    ELSE  shift, and go to state 154
+    END   shift, and go to state 155
+
+
+State 150
+
+   60 loop_statement: WHILE '(' expression ')' DO optional_statement . END ';'
+
+    END  shift, and go to state 156
+
+
+State 151
+
+   30 statement: IDENTIFIER '[' expression ']' EQ expression . ';'
+   42 expression: expression . '*' expression
+   43           | expression . '/' expression
+   44           | expression . '+' expression
+   45           | expression . '-' expression
+   46           | expression . '<' expression
+   47           | expression . '>' expression
+   48           | expression . '=' expression
+   49           | expression . LE_EQ expression
+   50           | expression . GR_EQ expression
+   53           | expression . AND expression
+   54           | expression . OR expression
+
+    AND    shift, and go to state 51
+    OR     shift, and go to state 52
+    LE_EQ  shift, and go to state 53
+    GR_EQ  shift, and go to state 54
+    '*'    shift, and go to state 55
+    '/'    shift, and go to state 56
+    '+'    shift, and go to state 57
+    '-'    shift, and go to state 58
+    '<'    shift, and go to state 59
+    '='    shift, and go to state 60
+    '>'    shift, and go to state 61
+    ';'    shift, and go to state 157
+
+
+State 152
+
+   11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type . ';'
+
+    ';'  shift, and go to state 158
 
 
 State 153
 
-   59 conditional_statement: IF '(' expression ')' THEN optional_statement . ELSE optional_statement END ';'
-   60                      | IF '(' expression ')' THEN optional_statement . END ';'
+    2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER . ';'
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER . ';' Procedure_dec
 
-    ELSE  shift, and go to state 158
-    END   shift, and go to state 159
+    ';'  shift, and go to state 159
 
 
 State 154
 
-   61 loop_statement: WHILE '(' expression ')' DO optional_statement . END ';'
-
-    END  shift, and go to state 160
-
-
-State 155
-
-   30 statement: IDENTIFIER '[' expression ']' EQ expression . ';'
-   43 expression: expression . '*' expression
-   44           | expression . '/' expression
-   45           | expression . '+' expression
-   46           | expression . '-' expression
-   47           | expression . '<' expression
-   48           | expression . '>' expression
-   49           | expression . '=' expression
-   50           | expression . LE_EQ expression
-   51           | expression . GR_EQ expression
-   54           | expression . AND expression
-   55           | expression . OR expression
-
-    AND    shift, and go to state 52
-    OR     shift, and go to state 53
-    LE_EQ  shift, and go to state 54
-    GR_EQ  shift, and go to state 55
-    '*'    shift, and go to state 56
-    '/'    shift, and go to state 57
-    '+'    shift, and go to state 58
-    '-'    shift, and go to state 59
-    '<'    shift, and go to state 60
-    '='    shift, and go to state 61
-    '>'    shift, and go to state 62
-    ';'    shift, and go to state 161
-
-
-State 156
-
-   11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type . ';'
-
-    ';'  shift, and go to state 162
-
-
-State 157
-
-    2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER . ';'
-
-    ';'  shift, and go to state 163
-
-
-State 158
-
-   59 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE . optional_statement END ';'
+   58 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE . optional_statement END ';'
 
     NEQ            shift, and go to state 23
-    IF             shift, and go to state 68
-    PRINT          shift, and go to state 69
-    PRINTLN        shift, and go to state 70
-    RETURN         shift, and go to state 71
-    WHILE          shift, and go to state 72
-    READ           shift, and go to state 73
-    IDENTIFIER     shift, and go to state 74
+    IF             shift, and go to state 66
+    PRINT          shift, and go to state 67
+    PRINTLN        shift, and go to state 68
+    RETURN         shift, and go to state 69
+    WHILE          shift, and go to state 70
+    READ           shift, and go to state 71
+    IDENTIFIER     shift, and go to state 72
     INT_CONST      shift, and go to state 25
     REAL_CONST     shift, and go to state 26
     STR_CONST      shift, and go to state 27
@@ -2487,82 +2441,94 @@ State 158
     '~'            shift, and go to state 30
     '('            shift, and go to state 31
 
-    $default  reduce using rule 64 (optional_statement)
-
     const_value            go to state 32
-    statement              go to state 75
-    expression             go to state 76
-    conditional_statement  go to state 77
-    loop_statement         go to state 78
-    optional_statement     go to state 164
-    function_invocation    go to state 80
+    statement              go to state 73
+    expression             go to state 74
+    conditional_statement  go to state 75
+    loop_statement         go to state 76
+    optional_statement     go to state 160
+    function_invocation    go to state 34
 
 
-State 159
+State 155
 
-   60 conditional_statement: IF '(' expression ')' THEN optional_statement END . ';'
+   59 conditional_statement: IF '(' expression ')' THEN optional_statement END . ';'
 
-    ';'  shift, and go to state 165
-
-
-State 160
-
-   61 loop_statement: WHILE '(' expression ')' DO optional_statement END . ';'
-
-    ';'  shift, and go to state 166
+    ';'  shift, and go to state 161
 
 
-State 161
+State 156
+
+   60 loop_statement: WHILE '(' expression ')' DO optional_statement END . ';'
+
+    ';'  shift, and go to state 162
+
+
+State 157
 
    30 statement: IDENTIFIER '[' expression ']' EQ expression ';' .
 
     $default  reduce using rule 30 (statement)
 
 
-State 162
+State 158
 
    11 variables: IDENTIFIER ':' ARRAY '[' INT_CONST ',' INT_CONST ']' OF data_type ';' .
 
     $default  reduce using rule 11 (variables)
 
 
-State 163
+State 159
 
     2 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' .
+    3              | PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' . Procedure_dec
 
+    PROCEDURE  shift, and go to state 16
+
+    _BEGIN    reduce using rule 2 (Procedure_dec)
+    _BEGIN    [reduce using rule 4 (Procedure_dec)]
     $default  reduce using rule 2 (Procedure_dec)
+
+    Procedure_dec  go to state 163
+
+
+State 160
+
+   58 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement . END ';'
+
+    END  shift, and go to state 164
+
+
+State 161
+
+   59 conditional_statement: IF '(' expression ')' THEN optional_statement END ';' .
+
+    $default  reduce using rule 59 (conditional_statement)
+
+
+State 162
+
+   60 loop_statement: WHILE '(' expression ')' DO optional_statement END ';' .
+
+    $default  reduce using rule 60 (loop_statement)
+
+
+State 163
+
+    3 Procedure_dec: PROCEDURE IDENTIFIER optional_arg_parentheses opt_func_type optional_var_con_declaration _BEGIN optional_statement END IDENTIFIER ';' Procedure_dec .
+
+    $default  reduce using rule 3 (Procedure_dec)
 
 
 State 164
 
-   59 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement . END ';'
+   58 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement END . ';'
 
-    END  shift, and go to state 167
+    ';'  shift, and go to state 165
 
 
 State 165
 
-   60 conditional_statement: IF '(' expression ')' THEN optional_statement END ';' .
+   58 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement END ';' .
 
-    $default  reduce using rule 60 (conditional_statement)
-
-
-State 166
-
-   61 loop_statement: WHILE '(' expression ')' DO optional_statement END ';' .
-
-    $default  reduce using rule 61 (loop_statement)
-
-
-State 167
-
-   59 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement END . ';'
-
-    ';'  shift, and go to state 168
-
-
-State 168
-
-   59 conditional_statement: IF '(' expression ')' THEN optional_statement ELSE optional_statement END ';' .
-
-    $default  reduce using rule 59 (conditional_statement)
+    $default  reduce using rule 58 (conditional_statement)
