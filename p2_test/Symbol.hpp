@@ -9,14 +9,19 @@ enum type{
     INTEGER_type,
     REAL_type,
     BOOLEAN_type,
-    VIOD
+    VIOD,
+    UNDEFINED
 };
 
 struct DataItem{
     string IdName = "None";
     int type = VIOD;
-    string value = "None";
     string entries = "None";
+
+    int val=0;
+    bool bval=false;
+    double dval=0.0;
+    string sval="";
 };
 
 class SymbolTable{
@@ -31,13 +36,11 @@ private:
 DataItem* SymbolTable::lookup(string s){
     if (IdSymbols.count(s))
     {
-        cout << "find it!"<< endl;
         return new DataItem(IdSymbols[s]);
     }
     else
     {
         return NULL;
-        cout << "Not found!" << endl;
     }
         
 }
@@ -82,7 +85,24 @@ int SymbolTable::Dump(){
                 cout << "VIOD" <<"\t\t";
                 break;
         }
-        cout << it->second.value <<"\t\t";
+        switch (it->second.type)
+        {
+            case STRING_type:
+                cout << it->second.sval <<"\t\t";
+                break;
+            case INTEGER_type:
+                cout << it->second.val <<"\t\t";
+                break;
+            case REAL_type:
+                cout << it->second.dval <<"\t\t";
+                break;
+            case BOOLEAN_type:
+                cout << it->second.bval <<"\t\t";
+                break;
+            case VIOD:
+                cout << "none" <<"\t\t";
+                break;
+        }
         cout << it->second.entries <<"\t\t" << endl;
     }
     cout<<("\n-----------------------------------------------------------------------\n");

@@ -1,5 +1,5 @@
 a.out:y.tab.cpp lex.yy.cpp
-	g++ -std=c++11 -Wno-deprecated-register y.tab.cpp -o parser -ll -ly
+	g++ -std=c++11 -Wno-deprecated-register Symbol.hpp y.tab.cpp -o parser -ll -ly
 
 lex.yy.cpp:modula.l
 	flex -o lex.yy.cpp modula.l
@@ -10,5 +10,6 @@ y.tab.cpp:test2.y
 clean:
 	-rm -f a.out
 	-rm -f *.cpp
-	-rm -f *.hpp
+	-rm -f y.tab.hpp
+	-rm -f y.output
 	-rm -f parser

@@ -1,0 +1,7 @@
+1、scanner在project 1的基礎上，在每個識別的符號後面加上了類似return 語句返回token
+類似："use"	{token(USE);return USE;}
+2、儲存value進yylval。
+3、然後新建一個"Symbol.hpp"，將SymbolTable相關function轉移到"Symbol.hpp"裡面，再在test2.y
+文檔裡面include進去使用。這樣改的好處是方便管理SymbolTable。
+
+

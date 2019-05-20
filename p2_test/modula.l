@@ -86,13 +86,13 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 
 "false"	{
 	tokenString("boolean","FALSE");
-	yylval.b_val = 0;
+	yylval.b_val == false;
 	return BOOLEAN_CONST;
 }
 
 "ture"	{
 	tokenString("boolean","TURE");
-	yylval.b_val = 1;
+	yylval.b_val == true;
 	return BOOLEAN_CONST;
 }
 
