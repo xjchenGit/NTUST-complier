@@ -23,6 +23,7 @@ void yyerror(string error_str);
 vector<SymbolTable> stack;
 SymbolTable SymbolList;
 vector<string> id_arr;
+int args_num=0;
 DataItem* lookupAll(string s);
 DataItem* lookupAllAddress(string s);
 
@@ -102,7 +103,19 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                 }
                 optional_arg_parentheses opt_func_type
                 {
-                    
+                    out << "\tmethod public static ";
+                        out << "int ";
+                        //out << "void ";后期需要补充
+                    out << *$2 + "(";
+                    for (int i = 0; i < args_num; i++) {
+                        if(i!=0) out << ",";
+                        out << "int";
+                    }
+                    out << ")\n";
+                    out  << "\tmax_stack 15\n";
+                    out  << "\tmax_locals 15\n\t{\n";
+                    args_num=0;
+
                     DataItem* func_id = new DataItem();
                     func_id->IdName=*$2;
                     func_id->type=$5;
@@ -112,6 +125,8 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                 optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
                 {
+                    out << "\n\t}\n";
+
                     if(*$2!=*$11)
                         yyerror("End's id != Procedure's id");
                     stack.back().Dump();
@@ -134,6 +149,7 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                 optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
                 {
+                    out << "\n}\n";
                     if(*$2!=*$11)
                         yyerror("End's id != Procedure's id");
                     stack.back().Dump();
@@ -221,6 +237,7 @@ optional_arg_parentheses: '(' optional_arguments ')'
 
 optional_arguments: IDENTIFIER ':' data_type
                 {
+                    args_num++;
                     DataItem* tempData=new DataItem();
                     tempData->IdName=*$1;
                     tempData->type=$3;
@@ -229,6 +246,7 @@ optional_arguments: IDENTIFIER ':' data_type
                 }
                 |   optional_arguments ',' IDENTIFIER ':' data_type
                 {
+                    args_num++;
                     DataItem* tempData=new DataItem();
                     tempData->IdName=*$3;
                     tempData->type=$5;
