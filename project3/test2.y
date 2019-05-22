@@ -182,11 +182,6 @@ constants:  CONST IDENTIFIER '=' expression ';'
             $3 -> IdName = *$1;
             $3 -> entries = "const";
             int a=stack.back().insert(*$1,*($3));
-            // if(a){
-            //     cout << ("--------------------------------------------")<<endl;
-            //     cout<<"const insert successful!"<<endl;
-            //     cout << ("--------------------------------------------")<<endl;
-            // }
         }
         ;
 
@@ -358,6 +353,8 @@ expression:     IDENTIFIER
                     yyerror("can't use the '*' operation");
                 }
                 $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<'imul\n';
             }
             |   expression '/' expression
             {
@@ -371,6 +368,8 @@ expression:     IDENTIFIER
                     yyerror("can't use the '/' operation");
                 }
                 $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<'idiv\n';
             }
             |   expression '+' expression
             {
@@ -385,6 +384,8 @@ expression:     IDENTIFIER
                 }
                 // cout << "'+' successed!"<<endl;
                 $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<'iadd\n';
             }
             |   expression '-' expression
             {
@@ -399,6 +400,8 @@ expression:     IDENTIFIER
                 }
                 // cout << "'-' successed!"<<endl;
                 $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<'isub\n';
             }
             |   expression '<' expression
             {
@@ -448,6 +451,8 @@ expression:     IDENTIFIER
                 // tempData->type = INTEGER_type;
                 // tempData->val = ~$2;
                 // $$ = tempData;
+                // if($1->type == INTEGER_type)
+                //     out<<'ixor\n';
             }
             |   expression AND expression
             {
@@ -455,6 +460,9 @@ expression:     IDENTIFIER
                 // tempData->type = BOOLEAN_type;
                 // tempData->bval = ($1-bval && $3->bval);
                 // $$ = tempData;
+                // if($1->type == INTEGER_type)
+                //     out<<'iand\n';
+
             }
             |   expression OR expression
             {
@@ -462,6 +470,8 @@ expression:     IDENTIFIER
                 // tempData->type = BOOLEAN_type;
                 // tempData->bval = ($1-bval || $3->bval);
                 // $$ = tempData;
+                // if($1->type == INTEGER_type)
+                //     out<<'ior\n';
             }
             |   '(' expression ')'
             {
@@ -472,6 +482,7 @@ expression:     IDENTIFIER
                 tempData->type=INTEGER_type;
                 tempData->val = -($2->val);
                 $$=tempData;
+                out<<'ineg\n';
             }
             ;
 
