@@ -306,8 +306,26 @@ statement:      IDENTIFIER EQ expression ';'
                 stack.back().Dump();
             }
             |   IDENTIFIER '[' expression ']' EQ expression ';'
-            |   PRINT expression ';'
-            |   PRINTLN expression ';'
+            |   {
+                    out << "getstatic java.io.PrintStream java.lang.System.out\n";
+                }
+                PRINT expression ';'
+                {
+                    if($3->type==INTEGER_type)
+                        out << "invokevirtual void java.io.PrintStream.print(int)\n";
+                    else
+                        out << "invokevirtual void java.io.PrintStream.print(java.lang.String)\n";
+                }
+            |   {
+                    out << "getstatic java.io.PrintStream java.lang.System.out\n";
+                }
+                PRINTLN expression ';'
+                {
+                    if($3->type==INTEGER_type)
+                        out << "invokevirtual void java.io.PrintStream.println(int)\n";
+                    else
+                        out << "invokevirtual void java.io.PrintStream.println(java.lang.String)\n";
+                }
             |   RETURN ';'
             |   RETURN expression ';'
 	        |	expression ';'
