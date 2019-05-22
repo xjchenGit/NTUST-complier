@@ -17,6 +17,7 @@ vector<SymbolTable> stack;
 SymbolTable SymbolList;
 vector<string> id_arr;
 DataItem* lookupAll(string s);
+DataItem* lookupAllAddress(string s);
 
 %}
 
@@ -70,7 +71,7 @@ program:    MODULE IDENTIFIER
             }
              _BEGIN optional_statement END IDENTIFIER '.'
             {
-                
+                stack.back().Dump();
                 if(*$2!=*$10)
                     yyerror("End's id != Module's id\n");
             }
@@ -142,7 +143,7 @@ opt_func_type: ':' data_type
             ;
 
 optional_var_con_declaration:  constants optional_var_con_declaration
-                            |  variables optional_var_con_declaration
+                            |  VAR variables 
                             |   
                             ;
 
@@ -170,19 +171,25 @@ constants:  CONST IDENTIFIER '=' expression ';'
         }
         ;
 
-variables:      VAR opt_IDENTIFIER ':' data_type ';'
+variables:   opt_IDENTIFIER ':' data_type ';' variables
             {
                 for(int i=0;i<id_arr.size();i++){
                     DataItem* tempData = new DataItem();
                     tempData->IdName = id_arr[i];
-                    tempData->type = $4;
+                    tempData->type = $3;
                     tempData->entries = "variables";
                     int a=stack.back().insert(id_arr[i],*tempData);
-                    // if(a)
-                    // {   cout << ("--------------------------------------------")<<endl;
-                    //     cout<<"variable insert successful!"<<endl;
-                    //     cout << ("--------------------------------------------")<<endl;
-                    // }
+                }
+                id_arr.clear();
+            }
+            | opt_IDENTIFIER ':' data_type ';'
+            {
+                for(int i=0;i<id_arr.size();i++){
+                    DataItem* tempData = new DataItem();
+                    tempData->IdName = id_arr[i];
+                    tempData->type = $3;
+                    tempData->entries = "variables";
+                    int a=stack.back().insert(id_arr[i],*tempData);
                 }
                 id_arr.clear();
             }
@@ -198,6 +205,7 @@ opt_IDENTIFIER:		IDENTIFIER ',' opt_IDENTIFIER
               string s=*$1;
               id_arr.push_back(s);
           }
+          |
 	      ;
 
 optional_arg_parentheses: '(' optional_arguments ')'
@@ -261,6 +269,22 @@ const_value:    INT_CONST {
             ;
 
 statement:      IDENTIFIER EQ expression ';'
+            {
+                DataItem *tempData=lookupAllAddress(*$1);
+                if(tempData == NULL) yyerror("ERROR! undeclared");
+                if($3->type==INTEGER_type)
+                {
+                    tempData->val=$3->val;
+                    cout <<"key" <<tempData->IdName<<endl;
+                    cout <<"value:"<<tempData->val<<endl;
+                }else if($3->type==BOOLEAN_type)
+                {
+                    tempData->bval=$3->bval;
+                    cout <<"key" <<tempData->IdName<<endl;
+                    cout <<"value:"<<tempData->bval<<endl;
+                }
+                stack.back().Dump();
+            }
             |   IDENTIFIER '[' expression ']' EQ expression ';'
             |   PRINT expression ';'
             |   PRINTLN expression ';'
@@ -271,12 +295,18 @@ statement:      IDENTIFIER EQ expression ';'
             |   loop_statement
             ;
 
-expression:     IDENTIFIER{  
-                DataItem* tempData=lookupAll(*$1);
+expression:     IDENTIFIER
+            {  
+                DataItem *tempData=lookupAll(*$1);
                 if(tempData == NULL) yyerror("ERROR! undeclared");
+                // cout <<tempData->IdName << endl;
+                // cout <<tempData->val<< endl;
                 $$=tempData;
             }
             |   const_value
+            {
+                $$ = $1;
+            }
             |   function_invocation
             |   expression '*' expression
             {
@@ -289,7 +319,6 @@ expression:     IDENTIFIER{
                 }else{
                     yyerror("can't use the '*' operation");
                 }
-                // cout << "'*' successed!"<<endl;
                 $$ = tempData;
             }
             |   expression '/' expression
@@ -303,7 +332,6 @@ expression:     IDENTIFIER{
                 }else{
                     yyerror("can't use the '/' operation");
                 }
-                // cout << "'/' successed!"<<endl;
                 $$ = tempData;
             }
             |   expression '+' expression
@@ -378,24 +406,24 @@ expression:     IDENTIFIER{
             }
             |   '~' expression
             {
-                DataItem *tempData = new DataItem();
-                tempData->type = INTEGER_type;
-                tempData->val = ~($2);
-                $$ = tempData;
+                // DataItem *tempData = new DataItem();
+                // tempData->type = INTEGER_type;
+                // tempData->val = ~$2;
+                // $$ = tempData;
             }
             |   expression AND expression
             {
-                DataItem *tempData = new DataItem();
-                tempData->type = INTEGER_type;
-                tempData->val = ($1-val & $3->val);
-                $$ = tempData;
+                // DataItem *tempData = new DataItem();
+                // tempData->type = BOOLEAN_type;
+                // tempData->bval = ($1-bval && $3->bval);
+                // $$ = tempData;
             }
             |   expression OR expression
             {
-                DataItem *tempData = new DataItem();
-                tempData->type = INTEGER_type;
-                tempData->val = ($1-val | $3->val);
-                $$ = tempData;
+                // DataItem *tempData = new DataItem();
+                // tempData->type = BOOLEAN_type;
+                // tempData->bval = ($1-bval || $3->bval);
+                // $$ = tempData;
             }
             |   '(' expression ')'
             {
@@ -479,18 +507,35 @@ int yywrap(){
 }
 
 DataItem* lookupAll(string s) {
-	for(int i=stack.size()-1;i>=0;i--){
+    for(int i=stack.size()-1;i>=0;i--){
 		if(stack[i].lookup(s)){
-            cout<<i<<endl;
 			return stack[i].lookup(s);
 		}
 	}
-    return NULL;
+}
+
+DataItem* lookupAllAddress(string s) {
+    for(int i=stack.size()-1;i>=0;i--){
+		if(stack[i].lookupAddress(s)){
+			return stack[i].lookupAddress(s);
+		}
+	}
 }
 
 int main(){
     SymbolTable global;
     stack.push_back(global);
     yyparse();
+    // DataItem *temp=new DataItem();
+    // string s="abc";
+    // temp->IdName=s;
+    
+    // int a=stack[0].insert(s,*temp);
+    // if(a)
+    //     cout << "insert successed!!" <<endl;
+
+    // DataItem *temp2=lookupAll(s);
+
+    // cout << temp2->IdName <<endl;    
 	return 0;	
 }

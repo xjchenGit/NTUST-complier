@@ -25,6 +25,7 @@ struct DataItem{
 class SymbolTable{
 public:
     DataItem* lookup(string s);
+    DataItem* lookupAddress(string s);
     bool insert(string s,DataItem value);
     int Dump();
 private:
@@ -34,13 +35,25 @@ private:
 DataItem* SymbolTable::lookup(string s){
     if (IdSymbols.count(s))
     {
+        // cout << IdSymbols.count(s) <<endl;
         return new DataItem(IdSymbols[s]);
     }
     else
     {
         return NULL;
+    }    
+}
+
+DataItem* SymbolTable::lookupAddress(string s){
+    if (IdSymbols.count(s))
+    {
+        // cout << IdSymbols.count(s) <<endl;
+        return &IdSymbols[s];
     }
-        
+    else
+    {
+        return NULL;
+    }    
 }
 
 bool SymbolTable::insert(string s,DataItem value)
