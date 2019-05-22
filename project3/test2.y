@@ -307,24 +307,24 @@ statement:      IDENTIFIER EQ expression ';'
             }
             |   IDENTIFIER '[' expression ']' EQ expression ';'
             |   {
-                    out << "getstatic java.io.PrintStream java.lang.System.out\n";
+                    out << "\t\tgetstatic java.io.PrintStream java.lang.System.out\n";
                 }
                 PRINT expression ';'
                 {
                     if($3->type==INTEGER_type)
-                        out << "invokevirtual void java.io.PrintStream.print(int)\n";
+                        out << "\t\tinvokevirtual void java.io.PrintStream.print(int)\n";
                     else
-                        out << "invokevirtual void java.io.PrintStream.print(java.lang.String)\n";
+                        out << "\t\tinvokevirtual void java.io.PrintStream.print(java.lang.String)\n";
                 }
             |   {
-                    out << "getstatic java.io.PrintStream java.lang.System.out\n";
+                    out << "\t\tgetstatic java.io.PrintStream java.lang.System.out\n";
                 }
                 PRINTLN expression ';'
                 {
                     if($3->type==INTEGER_type)
-                        out << "invokevirtual void java.io.PrintStream.println(int)\n";
+                        out << "\t\tinvokevirtual void java.io.PrintStream.println(int)\n";
                     else
-                        out << "invokevirtual void java.io.PrintStream.println(java.lang.String)\n";
+                        out << "\t\tinvokevirtual void java.io.PrintStream.println(java.lang.String)\n";
                 }
             |   RETURN ';'
             |   RETURN expression ';'
