@@ -7,7 +7,6 @@ using namespace std;
 enum type{
     STRING_type,
     INTEGER_type,
-    REAL_type,
     BOOLEAN_type,
     VIOD,
     UNDEFINED
@@ -61,7 +60,7 @@ int SymbolTable::Dump(){
     cout << ("\n-----------------------------------------------------------------------\n\t\t\t\tSymbol Table");
     cout << ("\n-----------------------------------------------------------------------\n");
     cout << ("ID\t\tName\t\tType\t\tValue\t\tentries\n");
-    string types[] = { "STRING_type", "INTEGER_type", "REAL_type", "BOOLEAN_type", "VIOD" };
+    string types[] = { "STRING_type", "INTEGER_type", "BOOLEAN_type", "VIOD" };
     for(auto it = IdSymbols.begin();it != IdSymbols.end();++it)
     {
         
@@ -74,9 +73,6 @@ int SymbolTable::Dump(){
                 break;
             case INTEGER_type:
                 cout << "INTEGER" <<"\t\t";
-                break;
-            case REAL_type:
-                cout << "REAL" <<"\t\t";
                 break;
             case BOOLEAN_type:
                 cout << "BOOLEAN" <<"\t\t";
@@ -92,9 +88,6 @@ int SymbolTable::Dump(){
                 break;
             case INTEGER_type:
                 cout << it->second.val <<"\t\t";
-                break;
-            case REAL_type:
-                cout << it->second.dval <<"\t\t";
                 break;
             case BOOLEAN_type:
                 cout << it->second.bval <<"\t\t";

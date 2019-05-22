@@ -243,7 +243,6 @@ optional_arguments: IDENTIFIER ':' data_type
 data_type:      STRING { $$=STRING_type; }
             |   INTEGER { $$=INTEGER_type; }
             |   BOOLEAN {$$=BOOLEAN_type;}
-            |   REAL {$$=REAL_type;}
             ;
 
 const_value:    INT_CONST {
@@ -256,12 +255,6 @@ const_value:    INT_CONST {
                 DataItem* tempData = new DataItem();
                 tempData->type = BOOLEAN_type;
                 tempData->bval = $1;
-                $$ = tempData;
-            }
-            |   REAL_CONST {
-                DataItem* tempData = new DataItem();
-                tempData->type = REAL_type;
-                tempData->dval = $1;
                 $$ = tempData;
             }
             |   STR_CONST {
@@ -299,10 +292,6 @@ expression:     IDENTIFIER{
                 {
                     tempData->type=$1->type;
                     tempData->val=$1->val * $3->val;
-                }else if($1->type==REAL_type)
-                {
-                    tempData->type=$1->type;
-                    tempData->dval=$1->dval * $3->dval;
                 }else{
                     yyerror("can't use the '*' operation");
                 }
@@ -317,10 +306,6 @@ expression:     IDENTIFIER{
                 {
                     tempData->type=$1->type;
                     tempData->val=$1->val / $3->val;
-                }else if($1->type==REAL_type)
-                {
-                    tempData->type=$1->type;
-                    tempData->dval=$1->dval / $3->dval;
                 }else{
                     yyerror("can't use the '/' operation");
                 }
@@ -335,10 +320,6 @@ expression:     IDENTIFIER{
                 {
                     tempData->type=$1->type;
                     tempData->val=$1->val + $3->val;
-                }else if($1->type==REAL_type)
-                {
-                    tempData->type=$1->type;
-                    tempData->dval=$1->dval + $3->dval;
                 }else{
                     yyerror("can't use the '*' operation");
                 }
@@ -353,10 +334,6 @@ expression:     IDENTIFIER{
                 {
                     tempData->type=$1->type;
                     tempData->val=$1->val - $3->val;
-                }else if($1->type==REAL_type)
-                {
-                    tempData->type=$1->type;
-                    tempData->dval=$1->dval - $3->dval;
                 }else{
                     yyerror("can't use the '-' operation");
                 }
