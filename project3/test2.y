@@ -5,11 +5,18 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <stdio.h>
+
 #include "Symbol.hpp"
 #include "lex.yy.cpp"
 using namespace std;
 #define TRACE_FLAG 1
 #define Trace(t) if (TRACE_FLAG) cout << "TRACE => " << t <<endl;
+
+string outName;
+ofstream out;
+
 
 int yylex();
 void yyerror(string error_str);
@@ -55,24 +62,35 @@ DataItem* lookupAllAddress(string s);
 
 program:    MODULE IDENTIFIER 
             {
+                out << "class " << *$2 << endl;
+                out << "{" << endl;
+                outName=*$2;
+
                 DataItem* id = new DataItem();
                 id->IdName=*$2;
                 id->entries="module";
                 int a=stack.back().insert(*$2,*id);
-                // if(a)
-                // {   cout << ("--------------------------------------------")<<endl;
-                //     cout<<"pro_id insert successedfull!"<<endl;
-                //     cout << ("--------------------------------------------")<<endl;
-                // }
             }
             optional_var_con_declaration Procedure_dec
             {
                 stack.back().Dump();
+
+                out  << "\tmethod public static void main(java.lang.String[])\n";
+                out  << "\tmax_stack 15\n";
+                out  << "\tmax_locals 15\n\t{\n";
+
             }
-             _BEGIN optional_statement END IDENTIFIER '.'
+             _BEGIN optional_statement 
+             {
+                 out << "\t\treturn\n";
+                 out << "\t}";
+             }
+             END IDENTIFIER '.'
             {
+                out << "\n}\n";
+
                 stack.back().Dump();
-                if(*$2!=*$10)
+                if(*$2!=*$11)
                     yyerror("End's id != Module's id\n");
             }
             ;
@@ -90,11 +108,6 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                     func_id->type=$5;
                     func_id->entries="Procedure";
                     int a=stack[0].insert(*$2,*func_id);
-                    // if(a)
-                    // {   cout << ("--------------------------------------------")<<endl;
-                    //     cout<<"procedure_id insert successedfull!"<<endl;
-                    //     cout << ("--------------------------------------------")<<endl;
-                    // }
                 }
                 optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
@@ -117,11 +130,6 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                     func_id->type=$5;
                     func_id->entries="Procedure";
                     int a=stack[0].insert(*$2,*func_id);
-                    // if(a)
-                    // {   cout << ("--------------------------------------------")<<endl;
-                    //     cout<<"procedure_id insert successedfull!"<<endl;
-                    //     cout << ("--------------------------------------------")<<endl;
-                    // }
                 }
                 optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
@@ -152,11 +160,6 @@ constants:  CONST IDENTIFIER '=' expression ';'
             $4 -> IdName = *$2;
             $4 -> entries = "const";
             int a=stack.back().insert(*$2,*($4));
-            // if(a){
-            //     cout << ("--------------------------------------------")<<endl;
-            //     cout<<"const insert successful!"<<endl;
-            //     cout << ("--------------------------------------------")<<endl;
-            // }
         }
         |   IDENTIFIER '=' expression ';' 
         {
@@ -179,6 +182,8 @@ variables:   opt_IDENTIFIER ':' data_type ';' variables
                     tempData->type = $3;
                     tempData->entries = "variables";
                     int a=stack.back().insert(id_arr[i],*tempData);
+                    if($3==INTEGER_type)
+                        out << "\tfield static int "<<id_arr[i]<<"\n";
                 }
                 id_arr.clear();
             }
@@ -190,6 +195,8 @@ variables:   opt_IDENTIFIER ':' data_type ';' variables
                     tempData->type = $3;
                     tempData->entries = "variables";
                     int a=stack.back().insert(id_arr[i],*tempData);
+                    if($3==INTEGER_type)
+                        out << "\tfield static int "<<id_arr[i]<<"\n";
                 }
                 id_arr.clear();
             }
@@ -219,11 +226,6 @@ optional_arguments: IDENTIFIER ':' data_type
                     tempData->type=$3;
                     tempData->entries="argument";
                     int a=stack.back().insert(*$1,*tempData);
-                    // if(a){
-                    //     cout << ("--------------------------------------------")<<endl;
-                    //     cout<<"argument insert successful!"<<endl;
-                    //     cout << ("--------------------------------------------")<<endl;
-                    // }
                 }
                 |   optional_arguments ',' IDENTIFIER ':' data_type
                 {
@@ -522,10 +524,27 @@ DataItem* lookupAllAddress(string s) {
 	}
 }
 
-int main(){
+int main(int argc, char *argv[]){
     SymbolTable global;
     stack.push_back(global);
-    yyparse();
+	
+	// open input file and check exist
+    yyin = fopen(argv[1], "r");
+	if(!yyin){
+		cerr << "[Error] File not found!" << endl;
+		exit(1);	
+	}
+
+	string source = string(argv[1]);
+	size_t found = source.rfind("/");
+	size_t foundDot = source.rfind(".ru");
+	outName = source.substr(found+1, foundDot - found - 1);
+	out.open(outName + ".jasm");
+    if (yyparse() == 1)
+    {
+        yyerror("[Error] Parsing error!");
+    }
+
     // DataItem *temp=new DataItem();
     // string s="abc";
     // temp->IdName=s;
@@ -536,6 +555,7 @@ int main(){
 
     // DataItem *temp2=lookupAll(s);
 
-    // cout << temp2->IdName <<endl;    
+    // cout << temp2->IdName <<endl;  
+
 	return 0;	
 }
