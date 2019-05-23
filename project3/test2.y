@@ -7,7 +7,6 @@
 #include <vector>
 #include <fstream>
 #include <stdio.h>
-
 #include "Symbol.hpp"
 #include "lex.yy.cpp"
 using namespace std;
@@ -16,7 +15,6 @@ using namespace std;
 
 string outName;
 ofstream out;
-
 
 int yylex();
 void yyerror(string error_str);
@@ -72,13 +70,10 @@ program:    MODULE IDENTIFIER
                 id->entries="module";
                 int a=stack.back().insert(*$2,*id);
             }
-            optional_var_con_declaration Procedure_dec
+            optional_var_con_declaration Procedure_dec_list
             {
                 stack.back().Dump();
-
-                out  << "\tmethod public static void main(java.lang.String[])\n";
-                out  << "\tmax_stack 15\n";
-                out  << "\tmax_locals 15\n\t{\n";
+                out  << "\tmethod public static void main(java.lang.String[])\n" << "\tmax_stack 15\n" << "\tmax_locals 15\n\t{\n";
 
             }
              _BEGIN optional_statement 
@@ -95,6 +90,10 @@ program:    MODULE IDENTIFIER
                     yyerror("End's id != Module's id\n");
             }
             ;
+Procedure_dec_list:Procedure_dec_list Procedure_dec 
+                | Procedure_dec
+                |
+                ;
 
 Procedure_dec:  PROCEDURE IDENTIFIER 
                 {
@@ -111,9 +110,7 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                         if(i!=0) out << ",";
                         out << "int";
                     }
-                    out << ")\n";
-                    out  << "\tmax_stack 15\n";
-                    out  << "\tmax_locals 15\n\t{\n";
+                    out << ")\n" << "\tmax_stack 15\n" << "\tmax_locals 15\n\t{\n";
                     args_num=0;
 
                     DataItem* func_id = new DataItem();
@@ -125,43 +122,18 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                 optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
                 {
-                    out << "\n\t}\n";
+                    out << "\t}\n";
 
                     if(*$2!=*$11)
                         yyerror("End's id != Procedure's id");
                     stack.back().Dump();
+                    cout<<stack.size()<<endl;
                     stack.pop_back();
-                } Procedure_dec
-                |   PROCEDURE IDENTIFIER 
-                {
-                    SymbolTable temp;
-                    stack.push_back(temp);
-                }
-                optional_arg_parentheses opt_func_type
-                {
-                    
-                    DataItem* func_id = new DataItem();
-                    func_id->IdName=*$2;
-                    func_id->type=$5;
-                    func_id->entries="Procedure";
-                    int a=stack[0].insert(*$2,*func_id);
-                }
-                optional_var_con_declaration 
-                _BEGIN optional_statement END IDENTIFIER ';'
-                {
-                    out << "\n}\n";
-                    if(*$2!=*$11)
-                        yyerror("End's id != Procedure's id");
-                    stack.back().Dump();
-                    stack.pop_back();
-                }
-                | 
+                    cout <<stack.size()<<endl;
+                } 
                 ;
 
-opt_func_type: ':' data_type
-            {
-                $$=$2;
-            }
+opt_func_type: ':' data_type{$$=$2;}
             |
             {Trace("null");}
             ;
@@ -176,12 +148,16 @@ constants:  CONST IDENTIFIER '=' expression ';'
             $4 -> IdName = *$2;
             $4 -> entries = "const";
             int a=stack.back().insert(*$2,*($4));
+            if($4->type==INTEGER_type)
+                out << "\tfield static int "<<*$2<<" = "<<$4->val<<"\n";
         }
         |   IDENTIFIER '=' expression ';' 
         {
             $3 -> IdName = *$1;
             $3 -> entries = "const";
             int a=stack.back().insert(*$1,*($3));
+            if($3->type==INTEGER_type)
+                out << "\tfield static int "<<*$1<<"="<<$3->val<<"\n";
         }
         ;
 
@@ -247,23 +223,22 @@ optional_arguments: IDENTIFIER ':' data_type
                     tempData->type=$5;
                     tempData->entries="argument";
                     int a=stack.back().insert(*$3,*tempData);
-                    // if(a){
-                    //     cout << ("--------------------------------------------")<<endl;
-                    //     cout<<"argument insert successful!"<<endl;
-                    //     cout << ("--------------------------------------------")<<endl;
-                    // }
                 }
                 |   
                 ;
-
-
 
 data_type:      STRING { $$=STRING_type; }
             |   INTEGER { $$=INTEGER_type; }
             |   BOOLEAN {$$=BOOLEAN_type;}
             ;
 
-const_value:    INT_CONST {
+const_value:    STR_CONST {
+                DataItem* tempData = new DataItem();
+                tempData->type = STRING_type;
+                tempData->sval = ($1)->c_str();
+                $$ = tempData;
+            }    
+            |   INT_CONST {
                 DataItem* tempData = new DataItem();
                 tempData->type = INTEGER_type;
                 tempData->val = $1;
@@ -273,12 +248,6 @@ const_value:    INT_CONST {
                 DataItem* tempData = new DataItem();
                 tempData->type = BOOLEAN_type;
                 tempData->bval = $1;
-                $$ = tempData;
-            }
-            |   STR_CONST {
-                DataItem* tempData = new DataItem();
-                tempData->type = STRING_type;
-                tempData->sval = ($1)->c_str();
                 $$ = tempData;
             }
             ;
@@ -299,30 +268,41 @@ statement:      IDENTIFIER EQ expression ';'
                     cout <<"value:"<<tempData->bval<<endl;
                 }
                 stack.back().Dump();
+                if(tempData->type==INTEGER_type||tempData->type==BOOLEAN_type){
+                    if(stack.size()==1)
+                        out << "\t\tputstatic int " << outName << "." << *$1 << "\n";
+                }
             }
-            |   IDENTIFIER '[' expression ']' EQ expression ';'
             |   {
                     out << "\t\tgetstatic java.io.PrintStream java.lang.System.out\n";
                 }
                 PRINT expression ';'
                 {
-                    if($3->type==INTEGER_type)
+                    if($3->type==INTEGER_type){
                         out << "\t\tinvokevirtual void java.io.PrintStream.print(int)\n";
-                    else
+                    }else if($3->type==STRING_type){
                         out << "\t\tinvokevirtual void java.io.PrintStream.print(java.lang.String)\n";
+                    }
                 }
             |   {
                     out << "\t\tgetstatic java.io.PrintStream java.lang.System.out\n";
                 }
                 PRINTLN expression ';'
                 {
-                    if($3->type==INTEGER_type)
+                    if($3->type==INTEGER_type){
                         out << "\t\tinvokevirtual void java.io.PrintStream.println(int)\n";
-                    else
+                    }else if($3->type==STRING_type){
                         out << "\t\tinvokevirtual void java.io.PrintStream.println(java.lang.String)\n";
+                    }
                 }
             |   RETURN ';'
+            {
+                out << "\treturn\n";
+            }
             |   RETURN expression ';'
+            {
+                out << "\t\tireturn\n";
+            }
 	        |	expression ';'
             |   conditional_statement
             |   loop_statement
@@ -332,12 +312,32 @@ expression:     IDENTIFIER
             {  
                 DataItem *tempData=lookupAll(*$1);
                 if(tempData == NULL) yyerror("ERROR! undeclared");
-                // cout <<tempData->IdName << endl;
-                // cout <<tempData->val<< endl;
                 $$=tempData;
+
+                // if(stack.size()!=1 && tempData->entries==const){
+
+                // }
+                if(stack.size()>1 && tempData->entries=="const")
+                {
+                    out<<"hhhhh";
+                }else if(tempData->type==INTEGER_type || tempData->type==BOOLEAN_type)
+                {
+                    if(!stack.back().lookup(*$1) || stack.size()==1){
+                        out << "\t\tgetstatic int " << outName << "." << *$1 << "\n";
+                    }else{
+                        int a=stack.back().getIndex(*$1);
+                        out << "\t\tiload " << a << "\n";
+                    }
+                }
             }
             |   const_value
             {
+                while(stack.size()>1){
+                    if($1->type==INTEGER_type)
+                        out<<"\t\tsipush "<<$1->val<<"\n";
+                    else if($1->type==STRING_type)
+                        out<<"\t\tldc "<<$1->sval<<"\n";
+                }
                 $$ = $1;
             }
             |   function_invocation
@@ -354,7 +354,7 @@ expression:     IDENTIFIER
                 }
                 $$ = tempData;
                 if($1->type == INTEGER_type)
-                    out<<'imul\n';
+                    out<<"\t\timul\n";
             }
             |   expression '/' expression
             {
@@ -369,7 +369,7 @@ expression:     IDENTIFIER
                 }
                 $$ = tempData;
                 if($1->type == INTEGER_type)
-                    out<<'idiv\n';
+                    out<<"\t\tidiv\n";
             }
             |   expression '+' expression
             {
@@ -385,7 +385,7 @@ expression:     IDENTIFIER
                 // cout << "'+' successed!"<<endl;
                 $$ = tempData;
                 if($1->type == INTEGER_type)
-                    out<<'iadd\n';
+                    out<<"\t\tiadd\n";
             }
             |   expression '-' expression
             {
@@ -401,7 +401,7 @@ expression:     IDENTIFIER
                 // cout << "'-' successed!"<<endl;
                 $$ = tempData;
                 if($1->type == INTEGER_type)
-                    out<<'isub\n';
+                    out<<"\t\tisub\n";
             }
             |   expression '<' expression
             {
@@ -409,6 +409,12 @@ expression:     IDENTIFIER
                 tempData->type = BOOLEAN_type;
                 tempData->bval = ($1->val <$3->val);
                 $$ = tempData;
+
+                out << "\t\tisub\n";
+                // int lb1 = lm.getLable();
+                // int lb2 = lm.getLable();
+                out << "\t\tiflt L" << "\n" << "\t\ticonst_0\n" << "\t\tgoto L" << "\n";
+                out << "\tL" << ":\n" << "\t\ticonst_1\n" << "\tL" << ":\n";
             }
             |   expression '>' expression
             {
@@ -416,6 +422,11 @@ expression:     IDENTIFIER
                 tempData->type = BOOLEAN_type;
                 tempData->bval = ($1->val > $3->val);
                 $$ = tempData;
+                out << "\t\tisub\n";
+                // int lb1 = lm.getLable();
+                // int lb2 = lm.getLable();
+                out << "\t\tifgt L"  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"  << "\n";
+                out << "\tL"  << ":\n" << "\t\ticonst_1\n" << "\tL"  << ":\n";
             }
             |   expression '=' expression
             {
@@ -423,6 +434,11 @@ expression:     IDENTIFIER
                 tempData->type = BOOLEAN_type;
                 tempData->bval = ($1->val == $3->val);
                 $$ = tempData;
+                out << "\t\tisub\n";
+                // int lb1 = lm.getLable();
+                // int lb2 = lm.getLable();
+                out << "\t\tifeq L"  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"  << "\n";
+                out << "\tL"  << ":\n" << "\t\ticonst_1\n" << "\tL"  << ":\n";
             }
             |   expression LE_EQ expression
             {
@@ -430,6 +446,11 @@ expression:     IDENTIFIER
                 tempData->type = BOOLEAN_type;
                 tempData->bval = ($1->val <= $3->val);
                 $$ = tempData;
+                out << "\t\tisub\n";
+                // int lb1 = lm.getLable();
+                // int lb2 = lm.getLable();
+                out << "\t\tifle L"  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"  << "\n";
+                out << "\tL"  << ":\n" << "\t\ticonst_1\n" << "\tL"  << ":\n";
             }
             |   expression GR_EQ expression
             {
@@ -437,6 +458,11 @@ expression:     IDENTIFIER
                 tempData->type = BOOLEAN_type;
                 tempData->bval = ($1->val >= $3->val);
                 $$ = tempData;
+                out << "\t\tisub\n";
+                // int lb1 = lm.getLable();
+                // int lb2 = lm.getLable();
+                out << "\t\tifge L" <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L" <<  "\n";
+                out << "\tL" <<  ":\n" << "\t\ticonst_1\n" << "\tL" <<  ":\n";
             }
             |   NEQ expression
             {
@@ -444,34 +470,38 @@ expression:     IDENTIFIER
                 tempData->type = BOOLEAN_type;
                 tempData->bval = (!$2->bval);
                 $$ = tempData;
+                out << "\t\tisub\n";
+                // int lb1 = lm.getLable();
+                // int lb2 = lm.getLable();
+                out << "\t\tifne L" <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L" <<  "\n";
+                out << "\tL" <<  ":\n" << "\t\ticonst_1\n" << "\tL" <<  ":\n";
             }
             |   '~' expression
             {
-                // DataItem *tempData = new DataItem();
-                // tempData->type = INTEGER_type;
-                // tempData->val = ~$2;
-                // $$ = tempData;
-                // if($1->type == INTEGER_type)
-                //     out<<'ixor\n';
+                DataItem *tempData = new DataItem();
+                tempData->type = INTEGER_type;
+                tempData->val = ~($2->val);
+                $$ = tempData;
+                if($2->type == INTEGER_type)
+                    out<<"ixor\n";
             }
             |   expression AND expression
             {
-                // DataItem *tempData = new DataItem();
-                // tempData->type = BOOLEAN_type;
-                // tempData->bval = ($1-bval && $3->bval);
-                // $$ = tempData;
-                // if($1->type == INTEGER_type)
-                //     out<<'iand\n';
-
+                DataItem *tempData = new DataItem();
+                tempData->type = BOOLEAN_type;
+                tempData->bval = ($1->bval && $3->bval);
+                $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<"iand\n";
             }
             |   expression OR expression
             {
-                // DataItem *tempData = new DataItem();
-                // tempData->type = BOOLEAN_type;
-                // tempData->bval = ($1-bval || $3->bval);
-                // $$ = tempData;
-                // if($1->type == INTEGER_type)
-                //     out<<'ior\n';
+                DataItem *tempData = new DataItem();
+                tempData->type = BOOLEAN_type;
+                tempData->bval = ($1->bval || $3->bval);
+                $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<"ior\n";
             }
             |   '(' expression ')'
             {
@@ -482,12 +512,13 @@ expression:     IDENTIFIER
                 tempData->type=INTEGER_type;
                 tempData->val = -($2->val);
                 $$=tempData;
-                out<<'ineg\n';
+                out<<"\t\tineg\n";
             }
             ;
 
 conditional_statement:  IF '(' expression ')' THEN
                         {
+                            out << "\t\tifeq L" << "\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
@@ -514,10 +545,12 @@ conditional_statement:  IF '(' expression ')' THEN
                         }
                          optional_statement END ';'
                         {
+                            // out << "\nL" << lm.takeLabel(0) << ":\n";
                             stack.back().Dump();
                             stack.pop_back();
                         }
                         ;
+
 
 loop_statement: WHILE '(' expression ')' DO
                 {
@@ -528,6 +561,8 @@ loop_statement: WHILE '(' expression ')' DO
                 {
                     stack.back().Dump();
                     stack.pop_back();
+                    out << "\t\tgoto L" << "\n";		// goto Lbegin
+	                out << "\t\nL" << ":\n";
                 }
                 ;
 
@@ -539,6 +574,16 @@ function_invocation:    IDENTIFIER '(' optional_comma_separated_expression ')'
                     {
                         DataItem* tempData=lookupAll(*$1);
                         Trace("IDENTIFIER '(' optional_comma_separated_expression ')'");
+                        out << "\t\tinvokestatic ";
+                        out << "int ";
+                        //out << "void ";后期需要补充
+                        out << outName + "." + *$1 + "(";
+                        for (int i = 0; i < args_num; i++) {
+                            if(i!=0) out << ",";
+                            out << "int";
+                        }
+                        out << ")\n";
+                        args_num=0;
                     }
                     ;
 

@@ -20,6 +20,7 @@ struct DataItem{
     bool bval=false;
     double dval=0.0;
     string sval="";
+    vector<DataItem> arg_arr;  //储存参数
 };
 
 class SymbolTable{
@@ -27,9 +28,11 @@ public:
     DataItem* lookup(string s);
     DataItem* lookupAddress(string s);
     bool insert(string s,DataItem value);
+    int getIndex(string s);
     int Dump();
 private:
     map<string,DataItem> IdSymbols;
+    vector<string> symbolIdx;
 };
 
 DataItem* SymbolTable::lookup(string s){
@@ -58,6 +61,7 @@ DataItem* SymbolTable::lookupAddress(string s){
 
 bool SymbolTable::insert(string s,DataItem value)
 {
+    symbolIdx.push_back(s);
     if (!IdSymbols.count(s))
     {
         IdSymbols[s]=value;
@@ -66,6 +70,14 @@ bool SymbolTable::insert(string s,DataItem value)
     {
         return false;
     }
+}
+
+int SymbolTable::getIndex(string s) {
+    for(int i = 0; i< symbolIdx.size();i++){
+        if(symbolIdx[i] == s)
+            return i;
+    }
+    return -1;
 }
 
 int SymbolTable::Dump(){

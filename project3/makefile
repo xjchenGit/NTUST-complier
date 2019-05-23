@@ -8,8 +8,4 @@ y.tab.cpp:test2.y
 	yacc -y -v -d test2.y -o y.tab.cpp
 
 clean:
-	-rm -f a.out
-	-rm -f *.cpp
-	-rm -f y.tab.hpp
-	-rm -f y.output
-	-rm -f parser
+	-rm -f a.out *.cpp y.tab.hpp y.output parser *.jasm *.class
