@@ -16,12 +16,14 @@ using namespace std;
 string outName;
 ofstream out;
 
+
 int yylex();
 void yyerror(string error_str);
 vector<SymbolTable> stack;
 SymbolTable SymbolList;
 vector<string> id_arr;
 int args_num=0;
+string funcname;
 DataItem* lookupAll(string s);
 DataItem* lookupAllAddress(string s);
 
@@ -97,6 +99,11 @@ Procedure_dec_list:Procedure_dec_list Procedure_dec
 
 Procedure_dec:  PROCEDURE IDENTIFIER 
                 {
+                    DataItem* func_id = new DataItem();
+                    func_id->IdName=*$2;
+                    func_id->entries="Procedure";
+                    funcname = *$2;
+                    stack[0].insert(*$2,*func_id);
                     SymbolTable temp;
                     stack.push_back(temp);
                 }
@@ -112,12 +119,10 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                     }
                     out << ")\n" << "\tmax_stack 15\n" << "\tmax_locals 15\n\t{\n";
                     args_num=0;
-
-                    DataItem* func_id = new DataItem();
-                    func_id->IdName=*$2;
+                    DataItem* func_id = stack[0].lookupAddress(funcname);
                     func_id->type=$5;
-                    func_id->entries="Procedure";
-                    int a=stack[0].insert(*$2,*func_id);
+                    stack[0].Dump();
+
                 }
                 optional_var_con_declaration 
                 _BEGIN optional_statement END IDENTIFIER ';'
@@ -214,6 +219,13 @@ optional_arguments: IDENTIFIER ':' data_type
                     tempData->type=$3;
                     tempData->entries="argument";
                     int a=stack.back().insert(*$1,*tempData);
+                    cout<<funcname<<"1"<<endl;
+                    DataItem *func = stack[stack.size()-2].lookupAddress(funcname);
+                    if(func==NULL) yyerror("function declation error");
+                    DataItem func_argument;
+                    func_argument.IdName = *$1;
+                    func_argument.type = $3;
+                    func->arg_arr.push_back(func_argument);
                 }
                 |   optional_arguments ',' IDENTIFIER ':' data_type
                 {
@@ -223,6 +235,13 @@ optional_arguments: IDENTIFIER ':' data_type
                     tempData->type=$5;
                     tempData->entries="argument";
                     int a=stack.back().insert(*$3,*tempData);
+                    cout<<funcname<<"2"<<endl;
+                    DataItem *func = stack[stack.size()-2].lookupAddress(funcname);
+                    if(func==NULL) yyerror("function declation error");
+                    DataItem func_argument;
+                    func_argument.IdName = *$3;
+                    func_argument.type = $5;
+                    func->arg_arr.push_back(func_argument);
                 }
                 |   
                 ;
@@ -310,16 +329,15 @@ expression:     IDENTIFIER
                 if(tempData == NULL) yyerror("ERROR! undeclared");
                 $$=tempData;
 
-                if(stack.size()!=1 && tempData->entries=="const"){
-                    cout<<"jhhhhhhh";
-                }
-                if(stack.size()>1 && tempData->entries=="const")
+                // if(stack.size()!=1 && tempData->entries=="const"){
+                //     cout<<"jhhhhhhh";
+                // }
+                if(stack.size()!= 1 && tempData->entries=="const")
                 {
                     out<<"hhhhh";
-                }else 
-                if(tempData->type==INTEGER_type || tempData->type==BOOLEAN_type)
+                }else if(tempData->type==INTEGER_type || tempData->type==BOOLEAN_type)
                 {
-                    if(!stack.back().lookup(*$1) || stack.size()==1){
+                    if(stack[0].lookup(*$1)){
                         out << "\t\tgetstatic int " << outName << "." << *$1 << "\n";
                     }else{
                         int a=stack.back().getIndex(*$1);
@@ -580,7 +598,7 @@ function_invocation:    IDENTIFIER '(' optional_comma_separated_expression ')'
                         out << "int ";
                         //out << "void ";后期需要补充
                         out << outName + "." + *$1 + "(";
-                        for (int i = 0; i < args_num; i++) {
+                        for (int i = 0; i < tempData->arg_arr.size(); i++) {
                             if(i!=0) out << ",";
                             out << "int";
                         }
