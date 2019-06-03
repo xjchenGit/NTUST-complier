@@ -28,6 +28,7 @@ DataItem* lookupAllAddress(string s);
 
 int LabalCount=0;
 int NowCount=0;
+int whilebegin=0;
 
 %}
 
@@ -449,8 +450,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tiflt L"<< LabalCount++ << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<< LabalCount++ << "\n";
-                out << "\tL"<< NowCount++ << ":\n" << "\t\ticonst_1\n" << "\tL"<< NowCount++ << ":\n";
+                out << "\t\tiflt L"<< ++LabalCount << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<< ++LabalCount << "\n";
+                out << "\tL"<< ++NowCount << ":\n" << "\t\ticonst_1\n" << "\tL"<< ++NowCount << ":\n";
             }
             |   expression '>' expression
             {
@@ -461,8 +462,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifgt L" << LabalCount++ << "\n" << "\t\ticonst_0\n" << "\t\tgoto L" << LabalCount++ << "\n";
-                out << "\tL"<< NowCount++  << ":\n" << "\t\ticonst_1\n" << "\tL" << NowCount++ << ":\n";
+                out << "\t\tifgt L" << ++LabalCount << "\n" << "\t\ticonst_0\n" << "\t\tgoto L" << ++LabalCount << "\n";
+                out << "\tL"<< ++NowCount  << ":\n" << "\t\ticonst_1\n" << "\tL" << ++NowCount << ":\n";
             }
             |   expression '=' expression
             {
@@ -473,8 +474,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifeq L"<<LabalCount++  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++  << "\n";
-                out << "\tL"<<NowCount++  << ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++  << ":\n";
+                out << "\t\tifeq L"<<++LabalCount  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount  << "\n";
+                out << "\tL"<<++NowCount  << ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount  << ":\n";
             }
             |   expression LE_EQ expression
             {
@@ -485,8 +486,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifle L"<<LabalCount++  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++  << "\n";
-                out << "\tL"<<NowCount++  << ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++  << ":\n";
+                out << "\t\tifle L"<<++LabalCount  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount  << "\n";
+                out << "\tL"<<++NowCount  << ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount  << ":\n";
             }
             |   expression GR_EQ expression
             {
@@ -497,8 +498,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifge L"<<LabalCount++ <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++ <<  "\n";
-                out << "\tL"<<NowCount++ <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++ <<  ":\n";
+                out << "\t\tifge L"<<++LabalCount <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount <<  "\n";
+                out << "\tL"<<++NowCount <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount <<  ":\n";
             }
             |   expression NEQ expression
             {
@@ -509,8 +510,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifne L"<<LabalCount++ <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++ <<  "\n";
-                out << "\tL"<<NowCount++ <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++ <<  ":\n";
+                out << "\t\tifne L"<<++LabalCount <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount <<  "\n";
+                out << "\tL"<<++NowCount <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount <<  ":\n";
             }
             |   '~' expression
             {
@@ -554,7 +555,7 @@ expression:     IDENTIFIER
 
 conditional_statement:  IF '(' expression ')' THEN
                         {
-                            out << "\t\tifeq L"<< LabalCount++ << "\n";
+                            out << "\t\tifeq L"<< ++LabalCount << "\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
@@ -565,28 +566,28 @@ conditional_statement:  IF '(' expression ')' THEN
                         }
                          ELSE 
                         {
-                            out << "\t\tgoto L"<< LabalCount++ << "\n";
-	                        out << "\tL"<< NowCount++ << ":\n";
+                            out << "\t\tgoto L"<< ++LabalCount << "\n";
+	                        out << "\tL"<< ++NowCount << ":\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
                          optional_statement 
                          END ';'
                         {
-                            out << "\tL"<< NowCount++ << ":\n";
+                            out << "\tL"<< ++NowCount << ":\n";
                             stack.back().Dump();
                             stack.pop_back();
                         }
                         |   IF '(' expression ')' THEN
                         {
-                            out << "\t\tifeq L"<< LabalCount++ << "\n";
+                            out << "\t\tifeq L"<< ++LabalCount << "\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
                          optional_statement END ';'
                         {
                             // out << "\nL" << lm.takeLabel(0) << ":\n";
-                            out << "\tL"<< NowCount++ << ":\n";
+                            out << "\tL"<< ++NowCount << ":\n";
                             stack.back().Dump();
                             stack.pop_back();
                         }
@@ -594,10 +595,12 @@ conditional_statement:  IF '(' expression ')' THEN
 
 
 loop_statement: WHILE '('
-                { out << "\n\tLbegin" << ":\n"; }
+                { out << "\n\tL"<< NowCount << ":\n";
+                  whilebegin=NowCount;
+                }
                 expression ')' DO
                 {
-                    out << "\t\tifeq Lexit" << "\n";	// ifeq Lexit
+                    out << "\t\tifeq L"<< ++LabalCount << "\n";	// ifeq Lexit
                     SymbolTable tempData = stack.back();
                     stack.push_back(tempData);
                 }
@@ -605,8 +608,8 @@ loop_statement: WHILE '('
                 {
                     stack.back().Dump();
                     stack.pop_back();
-                    out << "\t\tgoto Lbegin" << "\n";		// goto Lbegin
-	                out << "\n\tLexit" << ":\n";		// Lexit:
+                    out << "\t\tgoto L"<<whilebegin << "\n";		// goto Lbegin
+	                out << "\n\tL"<<++NowCount << ":\n";		// Lexit:
                 }
                 ;
 

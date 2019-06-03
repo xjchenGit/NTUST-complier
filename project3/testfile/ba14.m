@@ -10,4 +10,4 @@ begin
   println Fn;
 end Fourteen.
 
-//过不了
+//2
