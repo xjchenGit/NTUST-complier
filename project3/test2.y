@@ -16,7 +16,6 @@ using namespace std;
 string outName;
 ofstream out;
 
-
 int yylex();
 void yyerror(string error_str);
 vector<SymbolTable> stack;
@@ -26,6 +25,9 @@ int args_num=0;
 string funcname;
 DataItem* lookupAll(string s);
 DataItem* lookupAllAddress(string s);
+
+int LabalCount=0;
+int NowCount=0;
 
 %}
 
@@ -76,9 +78,14 @@ program:    MODULE IDENTIFIER
             {
                 stack.back().Dump();
                 out  << "\tmethod public static void main(java.lang.String[])\n" << "\tmax_stack 15\n" << "\tmax_locals 15\n\t{\n";
-
+                
             }
-             _BEGIN optional_statement 
+             _BEGIN 
+             {
+                SymbolTable tempData;
+                stack.push_back(tempData);
+             }
+             optional_statement 
              {
                  out << "\t\treturn\n";
                  out << "\t}";
@@ -88,10 +95,16 @@ program:    MODULE IDENTIFIER
                 out << "\n}\n";
 
                 stack.back().Dump();
-                if(*$2!=*$11)
+                stack.pop_back();
+                if(*$2!=*$12)
                     yyerror("End's id != Module's id\n");
             }
             ;
+optional_var_con_declaration:  constants optional_var_con_declaration
+                            |  VAR variables optional_var_con_declaration
+                            |   
+                            ;
+
 Procedure_dec_list:Procedure_dec_list Procedure_dec 
                 | Procedure_dec
                 |
@@ -138,31 +151,26 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                 } 
                 ;
 
+
 opt_func_type: ':' data_type{$$=$2;}
             |
             {Trace("null");}
             ;
 
-optional_var_con_declaration:  constants optional_var_con_declaration
-                            |  VAR variables 
-                            |   
-                            ;
+
 
 constants:  CONST IDENTIFIER '=' expression ';'
         {
             $4 -> IdName = *$2;
             $4 -> entries = "const";
             int a=stack.back().insert(*$2,*($4));
-            if($4->type==INTEGER_type)
-                out << "\tfield static int "<<*$2<<" = "<<$4->val<<"\n";
+            
         }
         |   IDENTIFIER '=' expression ';' 
         {
             $3 -> IdName = *$1;
             $3 -> entries = "const";
             int a=stack.back().insert(*$1,*($3));
-            if($3->type==INTEGER_type)
-                out << "\tfield static int "<<*$1<<" = "<<$3->val<<"\n";
         }
         ;
 
@@ -275,17 +283,23 @@ statement:      IDENTIFIER EQ expression ';'
             {
                 DataItem *tempData=lookupAllAddress(*$1);
                 if(tempData == NULL) yyerror("ERROR! undeclared");
-                if($3->type==INTEGER_type)
-                {
+                if($3->type==INTEGER_type){
                     tempData->val=$3->val;
-                }else if($3->type==BOOLEAN_type)
-                {
+                }else if($3->type==BOOLEAN_type){
                     tempData->bval=$3->bval;
                 }
                 stack.back().Dump();
+
                 if(tempData->type==INTEGER_type||tempData->type==BOOLEAN_type){
-                    if(stack.size()==1)
+                    if(!stack.back().lookup(*$1) || stack.size()==1){
                         out << "\t\tputstatic int " << outName << "." << *$1 << "\n";
+                    }else if(stack.back().lookup(*$1))
+                    {
+                        DataItem *tempData=stack.back().lookup(*$1);
+                        out << tempData->IdName <<"\n";
+                        int a=stack.back().getIndex(*$1);
+                        out << "\t\tistore " << a <<"\n";
+                    }
                 }
             }
             |   {
@@ -328,18 +342,25 @@ expression:     IDENTIFIER
                 DataItem *tempData=lookupAll(*$1);
                 if(tempData == NULL) yyerror("ERROR! undeclared");
                 $$=tempData;
-
-                // if(stack.size()!=1 && tempData->entries=="const"){
-                //     cout<<"jhhhhhhh";
-                // }
                 if(stack.size()!= 1 && tempData->entries=="const")
                 {
-                    out<<"hhhhh";
+                    if(tempData->type == STRING_type){
+                        out << "\t\tldc \"" << tempData->sval << "\"\n";
+                    }else if(tempData->type == INTEGER_type||tempData->type==BOOLEAN_type){
+                        out << "\t\tsipush " << tempData->val << "\n";
+                    }
                 }else if(tempData->type==INTEGER_type || tempData->type==BOOLEAN_type)
                 {
-                    if(stack[0].lookup(*$1)){
+                    if(!stack.back().lookup(*$1)|| stack.size()==1){
                         out << "\t\tgetstatic int " << outName << "." << *$1 << "\n";
-                    }else{
+                    }else if(stack.back().lookup(*$1))
+                    {
+                        DataItem *tempData=stack.back().lookup(*$1);
+
+                        // out << tempData->IdName <<"\n";
+                        // int num=stack.size();
+                        // out << "stack size : " << num << "\n";
+                        
                         int a=stack.back().getIndex(*$1);
                         out << "\t\tiload " << a << "\n";
                     }
@@ -347,12 +368,12 @@ expression:     IDENTIFIER
             }
             |   const_value
             {
-                
+                if(stack.size()!=1){
                     if($1->type==INTEGER_type)
                         out<<"\t\tsipush "<<$1->val<<"\n";
                     else if($1->type==STRING_type)
                         out<<"\t\tldc "<<$1->sval<<"\n";
-                
+                }
                 $$ = $1;
             }
             |   function_invocation
@@ -428,8 +449,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tiflt L" << "\n" << "\t\ticonst_0\n" << "\t\tgoto L" << "\n";
-                out << "\tL" << ":\n" << "\t\ticonst_1\n" << "\tL" << ":\n";
+                out << "\t\tiflt L"<< LabalCount++ << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<< LabalCount++ << "\n";
+                out << "\tL"<< NowCount++ << ":\n" << "\t\ticonst_1\n" << "\tL"<< NowCount++ << ":\n";
             }
             |   expression '>' expression
             {
@@ -440,8 +461,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifgt L"  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"  << "\n";
-                out << "\tL"  << ":\n" << "\t\ticonst_1\n" << "\tL"  << ":\n";
+                out << "\t\tifgt L" << LabalCount++ << "\n" << "\t\ticonst_0\n" << "\t\tgoto L" << LabalCount++ << "\n";
+                out << "\tL"<< NowCount++  << ":\n" << "\t\ticonst_1\n" << "\tL" << NowCount++ << ":\n";
             }
             |   expression '=' expression
             {
@@ -452,8 +473,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifeq L"  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"  << "\n";
-                out << "\tL"  << ":\n" << "\t\ticonst_1\n" << "\tL"  << ":\n";
+                out << "\t\tifeq L"<<LabalCount++  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++  << "\n";
+                out << "\tL"<<NowCount++  << ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++  << ":\n";
             }
             |   expression LE_EQ expression
             {
@@ -464,8 +485,8 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifle L"  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"  << "\n";
-                out << "\tL"  << ":\n" << "\t\ticonst_1\n" << "\tL"  << ":\n";
+                out << "\t\tifle L"<<LabalCount++  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++  << "\n";
+                out << "\tL"<<NowCount++  << ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++  << ":\n";
             }
             |   expression GR_EQ expression
             {
@@ -476,20 +497,20 @@ expression:     IDENTIFIER
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifge L" <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L" <<  "\n";
-                out << "\tL" <<  ":\n" << "\t\ticonst_1\n" << "\tL" <<  ":\n";
+                out << "\t\tifge L"<<LabalCount++ <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++ <<  "\n";
+                out << "\tL"<<NowCount++ <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++ <<  ":\n";
             }
-            |   NEQ expression
+            |   expression NEQ expression
             {
                 DataItem *tempData = new DataItem();
                 tempData->type = BOOLEAN_type;
-                tempData->bval = (!$2->bval);
+                tempData->bval = ($1->bval != $3->bval);
                 $$ = tempData;
                 out << "\t\tisub\n";
                 // int lb1 = lm.getLable();
                 // int lb2 = lm.getLable();
-                out << "\t\tifne L" <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L" <<  "\n";
-                out << "\tL" <<  ":\n" << "\t\ticonst_1\n" << "\tL" <<  ":\n";
+                out << "\t\tifne L"<<LabalCount++ <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<LabalCount++ <<  "\n";
+                out << "\tL"<<NowCount++ <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<NowCount++ <<  ":\n";
             }
             |   '~' expression
             {
@@ -533,7 +554,7 @@ expression:     IDENTIFIER
 
 conditional_statement:  IF '(' expression ')' THEN
                         {
-                            out << "\t\tifeq L" << "\n";
+                            out << "\t\tifeq L"<< LabalCount++ << "\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
@@ -544,36 +565,39 @@ conditional_statement:  IF '(' expression ')' THEN
                         }
                          ELSE 
                         {
-                            out << "\t\tgoto L" << "\n";
-	                        out << "\tL" << ":\n";
+                            out << "\t\tgoto L"<< LabalCount++ << "\n";
+	                        out << "\tL"<< NowCount++ << ":\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
                          optional_statement 
                          END ';'
                         {
-                            out << "\tL" << ":\n";
+                            out << "\tL"<< NowCount++ << ":\n";
                             stack.back().Dump();
                             stack.pop_back();
                         }
                         |   IF '(' expression ')' THEN
                         {
-                            out << "\t\tifeq L" << "\n";
+                            out << "\t\tifeq L"<< LabalCount++ << "\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
                          optional_statement END ';'
                         {
                             // out << "\nL" << lm.takeLabel(0) << ":\n";
-                            out << "\tL" << ":\n";
+                            out << "\tL"<< NowCount++ << ":\n";
                             stack.back().Dump();
                             stack.pop_back();
                         }
                         ;
 
 
-loop_statement: WHILE '(' expression ')' DO
+loop_statement: WHILE '('
+                { out << "\n\tLbegin" << ":\n"; }
+                expression ')' DO
                 {
+                    out << "\t\tifeq Lexit" << "\n";	// ifeq Lexit
                     SymbolTable tempData = stack.back();
                     stack.push_back(tempData);
                 }
@@ -581,8 +605,8 @@ loop_statement: WHILE '(' expression ')' DO
                 {
                     stack.back().Dump();
                     stack.pop_back();
-                    // out << "\t\tgoto L" << "\n";		// goto Lbegin
-	                // out << "\t\nL" << ":\n";
+                    out << "\t\tgoto Lbegin" << "\n";		// goto Lbegin
+	                out << "\n\tLexit" << ":\n";		// Lexit:
                 }
                 ;
 

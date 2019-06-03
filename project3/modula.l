@@ -24,6 +24,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 %x COMMENTS
 
 %%
+"//"[^\n]* {LIST;}
 ","	{token(',');return yytext[0];}
 ":"	{token(':');return yytext[0];}
 "."	{token('.');return yytext[0];}
@@ -96,9 +97,6 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 	return BOOLEAN_CONST;
 }
 
-[/][/]([a-zA-Z \t])* {
-		LIST;
-		}
 
 {identifiers} {
 	tokenString("id",yytext);
