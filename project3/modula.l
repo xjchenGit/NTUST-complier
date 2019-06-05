@@ -67,6 +67,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "if"	{token(IF);return IF;}
 "in"	{token(IN);return IN;}
 "integer"	{token(INTEGER);return INTEGER;}
+"real"	{token(REAL);return REAL;}
 "loop"	{token(LOOP);return LOOP;}
 "module"	{token(MODULE);return MODULE;}
 "print"	{token(PRINT);return PRINT;}
@@ -74,7 +75,6 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "procedure"	{token(PROCEDURE);return PROCEDURE;}
 "repeat"	{token(REPEAT);return REPEAT;}
 "return"	{token(RETURN);return(RETURN);}
-"real"	{token(REAL);return REAL;}
 "string"	{token(STRING);return STRING;}
 "record"	{token(RECORD);return RECORD;}
 "then"	{token(THEN);return THEN;}
@@ -84,6 +84,7 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 "var"	{token(VAR);return VAR;}
 "while"	{token(WHILE);return WHILE;}
 "boolean"	{token(BOOLEAN);return BOOLEAN;}
+
 
 "false"	{
 	tokenString("boolean","FALSE");
@@ -108,6 +109,11 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 	tokenInteger("integer",atoi(yytext));
 	yylval._val = atoi(yytext);
 	return INT_CONST;
+}
+{real}	{
+	tokenString("real",yytext);
+	yylval.d_val = atof(yytext);
+	return REAL_CONST;
 }
 
 {str} {
@@ -170,17 +176,3 @@ str [\"]([A-Za-z0-9\n\t ]|([^\"]|[\"][\"]))*[\"]
 		exit(-1);
 	}
 %%
-
-//	id的存值
-
-// int lookup = 0;
-// 	for(int i = 0; i < table_index; i++){
-// 		if(!strcmp(table[i],yytext)){
-// 			lookup = 1;
-// 			break;
-// 		}
-// 	}
-// 	if(!lookup){
-// 		strcpy(table[table_index],yytext);
-// 		table_index++;
-// 	}

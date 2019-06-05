@@ -1,7 +1,7 @@
 module Nine
 var c:integer;
 const a=20;
-procedure mul(a:integer,b:integer):integer
+procedure mul(a:integer,b:integer) : integer
 begin
   return a*b;
 end mul;
@@ -20,4 +20,4 @@ begin
   end;
 end Nine.
 
-//过不了
+//10

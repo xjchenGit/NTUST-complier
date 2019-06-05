@@ -1,3 +1,31 @@
+// module Fifteen
+// const a=15;
+// var c:integer;
+// procedure add(a:integer,b:integer):integer
+// begin
+//    return a+b;
+// end add;
+// begin
+//    c := add(a,10);
+//    if (c>10) then
+//       c:=c+10;
+//    else
+//       c:=c-10;
+//    end;
+//    if (c>10) then
+//       c:=c+10;
+//    end;
+//    while (c>1) do
+//       c:=c-1;
+//       if(c > 1) then
+//          print c;
+//       else
+//          print c;
+//       end;
+//    end;
+//    print c;
+// end Fifteen.
+
 module Fifteen
 const a=15;
 var c:integer;
@@ -24,7 +52,8 @@ begin
          c := c/3;
       end;
    end;
-   println c;
+   print c;
 end Fifteen.
 
+//1
 //过不了

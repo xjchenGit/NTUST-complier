@@ -10,7 +10,6 @@ begin
     FNminus1 := temp;
     n := n - 1;
   end;
-
   println Fn;
 end Four.
 

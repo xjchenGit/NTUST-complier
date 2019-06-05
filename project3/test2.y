@@ -50,6 +50,7 @@ int whilebegin=0;
 %token <_val> INT_CONST
 %token <s_val> STR_CONST
 %token <b_val> BOOLEAN_CONST
+%token <d_val> REAL_CONST
 %type <id_data> const_value expression function_invocation
 //%type <id_data> opt_IDENTIFIER
 %type <type> data_type opt_func_type
@@ -124,7 +125,7 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                 optional_arg_parentheses opt_func_type
                 {
                     out << "\tmethod public static ";
-                        out << "int ";
+                    out << "int ";
                         //out << "void ";后期需要补充
                     out << *$2 + "(";
                     for (int i = 0; i < args_num; i++) {
@@ -183,8 +184,13 @@ variables:   opt_IDENTIFIER ':' data_type ';' variables
                     tempData->type = $3;
                     tempData->entries = "variables";
                     int a=stack.back().insert(id_arr[i],*tempData);
-                    if($3==INTEGER_type)
+                    if($3==INTEGER_type){
                         out << "\tfield static int "<<id_arr[i]<<"\n";
+                    }else if($3==STRING_type){
+                        out << "\tfield static java.lang.String "<<id_arr[i]<<"\n";
+                    }else if($3==REAL_type){
+                        out << "\tfield static double "<<id_arr[i]<<"\n";
+                    }
                 }
                 id_arr.clear();
             }
@@ -196,8 +202,13 @@ variables:   opt_IDENTIFIER ':' data_type ';' variables
                     tempData->type = $3;
                     tempData->entries = "variables";
                     int a=stack.back().insert(id_arr[i],*tempData);
-                    if($3==INTEGER_type)
+                    if($3==INTEGER_type){
                         out << "\tfield static int "<<id_arr[i]<<"\n";
+                    }else if($3==STRING_type){
+                        out << "\tfield static java.lang.String "<<id_arr[i]<<"\n";
+                    }else if($3==REAL_type){
+                        out << "\tfield static double "<<id_arr[i]<<"\n";
+                    }
                 }
                 id_arr.clear();
             }
@@ -258,6 +269,7 @@ optional_arguments: IDENTIFIER ':' data_type
 data_type:      STRING { $$=STRING_type; }
             |   INTEGER { $$=INTEGER_type; }
             |   BOOLEAN {$$=BOOLEAN_type;}
+            |   REAL {$$=REAL_type;}
             ;
 
 const_value:    STR_CONST {
@@ -278,6 +290,12 @@ const_value:    STR_CONST {
                 tempData->bval = $1;
                 $$ = tempData;
             }
+            |   REAL_CONST {
+                DataItem* tempData = new DataItem();
+                tempData->type = REAL_type;
+                tempData->dval = $1;
+                $$ = tempData;
+            }
             ;
 
 statement:      IDENTIFIER EQ expression ';'
@@ -288,12 +306,35 @@ statement:      IDENTIFIER EQ expression ';'
                     tempData->val=$3->val;
                 }else if($3->type==BOOLEAN_type){
                     tempData->bval=$3->bval;
+                }else if($3->type==STRING_type){
+                    tempData->sval=$3->sval;
+                }else if($3->type==REAL_type){
+                    tempData->dval=$3->dval;
                 }
                 stack.back().Dump();
-
                 if(tempData->type==INTEGER_type||tempData->type==BOOLEAN_type){
                     if(!stack.back().lookup(*$1) || stack.size()==1){
                         out << "\t\tputstatic int " << outName << "." << *$1 << "\n";
+                    }else if(stack.back().lookup(*$1))
+                    {
+                        DataItem *tempData=stack.back().lookup(*$1);
+                        out << tempData->IdName <<"\n";
+                        int a=stack.back().getIndex(*$1);
+                        out << "\t\tistore " << a <<"\n";
+                    }
+                }else if(tempData->type==STRING_type){
+                    if(!stack.back().lookup(*$1) || stack.size()==1){
+                        out << "\t\tputstatic java.lang.String " << *$1 << "\n";
+                    }else if(stack.back().lookup(*$1))
+                    {
+                        DataItem *tempData=stack.back().lookup(*$1);
+                        out << tempData->IdName <<"\n";
+                        int a=stack.back().getIndex(*$1);
+                        out << "\t\tistore " << a <<"\n";
+                    }
+                }else if(tempData->type==REAL_type){
+                    if(!stack.back().lookup(*$1) || stack.size()==1){
+                        out << "\t\tputstatic double " << *$1 << "\n";
                     }else if(stack.back().lookup(*$1))
                     {
                         DataItem *tempData=stack.back().lookup(*$1);
@@ -312,17 +353,19 @@ statement:      IDENTIFIER EQ expression ';'
                         out << "\t\tinvokevirtual void java.io.PrintStream.print(int)\n";
                     }else if($3->type==STRING_type){
                         out << "\t\tinvokevirtual void java.io.PrintStream.print(java.lang.String)\n";
+                    }else if($3->type==REAL_type){
+                        out << "\t\tinvokevirtual void java.io.PrintStream.print(double)\n";
                     }
                 }
-            |   {
-                    out << "\t\tgetstatic java.io.PrintStream java.lang.System.out\n";
-                }
+            |   {   out << "\t\tgetstatic java.io.PrintStream java.lang.System.out\n";  }
                 PRINTLN expression ';'
                 {
                     if($3->type==INTEGER_type){
                         out << "\t\tinvokevirtual void java.io.PrintStream.println(int)\n";
                     }else if($3->type==STRING_type){
                         out << "\t\tinvokevirtual void java.io.PrintStream.println(java.lang.String)\n";
+                    }else if($3->type==REAL_type){
+                        out << "\t\tinvokevirtual void java.io.PrintStream.println(double)\n";
                     }
                 }
             |   RETURN ';'
@@ -349,6 +392,8 @@ expression:     IDENTIFIER
                         out << "\t\tldc \"" << tempData->sval << "\"\n";
                     }else if(tempData->type == INTEGER_type||tempData->type==BOOLEAN_type){
                         out << "\t\tsipush " << tempData->val << "\n";
+                    }else if(tempData->type == REAL_type){
+                        out << "\t\tIdc2_w " << tempData->dval << "\n";
                     }
                 }else if(tempData->type==INTEGER_type || tempData->type==BOOLEAN_type)
                 {
@@ -357,11 +402,26 @@ expression:     IDENTIFIER
                     }else if(stack.back().lookup(*$1))
                     {
                         DataItem *tempData=stack.back().lookup(*$1);
-
-                        // out << tempData->IdName <<"\n";
-                        // int num=stack.size();
-                        // out << "stack size : " << num << "\n";
-                        
+                        int a=stack.back().getIndex(*$1);
+                        out << "\t\tiload " << a << "\n";
+                    }
+                }else if(tempData->type==STRING_type)
+                {
+                    if(!stack.back().lookup(*$1)|| stack.size()==1){
+                        out << "\t\tgetstatic java.lang.String " << *$1 << "\n";
+                    }else if(stack.back().lookup(*$1))
+                    {
+                        DataItem *tempData=stack.back().lookup(*$1);
+                        int a=stack.back().getIndex(*$1);
+                        out << "\t\tiload " << a << "\n";
+                    }
+                }else if(tempData->type==REAL_type)
+                {
+                    if(!stack.back().lookup(*$1)|| stack.size()==1){
+                        out << "\t\tgetstatic double " << *$1 << "\n";
+                    }else if(stack.back().lookup(*$1))
+                    {
+                        DataItem *tempData=stack.back().lookup(*$1);
                         int a=stack.back().getIndex(*$1);
                         out << "\t\tiload " << a << "\n";
                     }
@@ -374,6 +434,8 @@ expression:     IDENTIFIER
                         out<<"\t\tsipush "<<$1->val<<"\n";
                     else if($1->type==STRING_type)
                         out<<"\t\tldc "<<$1->sval<<"\n";
+                    else if($1->type==REAL_type)
+                        out<<"\t\tldc2_w "<<$1->dval<<"\n";
                 }
                 $$ = $1;
             }
@@ -386,27 +448,61 @@ expression:     IDENTIFIER
                 {
                     tempData->type=$1->type;
                     tempData->val=$1->val * $3->val;
+                }if($1->type==REAL_type){
+                    tempData->type=$1->type;
+                    tempData->dval=$1->dval * $3->dval;
                 }else{
                     yyerror("can't use the '*' operation");
                 }
                 $$ = tempData;
                 if($1->type == INTEGER_type)
                     out<<"\t\timul\n";
+                else if($1->type == REAL_type)
+                    out<<"\t\tdmul\n";
             }
             |   expression '/' expression
             {
                 if($1->type != $3->type) yyerror("left != right");
                 DataItem *tempData = new DataItem();
+                if($3->val==0)
+                    $3->val=1;
                 if($1->type==INTEGER_type)
                 {
                     tempData->type=$1->type;
-                    tempData->val=$1->val / $3->val;
+                    double temp=$1->val/$3->val;
+                    tempData->val=(int)temp;
+                    cout<<tempData->val<<endl;
+                }if($1->type==REAL_type)
+                {
+                    tempData->type=$1->type;
+                    double temp=$1->dval/$3->dval;
+                    tempData->dval=temp;
+                    cout<<tempData->dval<<endl;
                 }else{
                     yyerror("can't use the '/' operation");
                 }
                 $$ = tempData;
                 if($1->type == INTEGER_type)
                     out<<"\t\tidiv\n";
+                else if($1->type == REAL_type)
+                    out<<"\t\tddiv\n";
+            }
+            |   expression '%' expression
+            {
+                if($1->type != $3->type) yyerror("left != right");
+                DataItem *tempData = new DataItem();
+                if($3->val==0)
+                    $3->val=1;
+                if($1->type==INTEGER_type)
+                {
+                    tempData->type=$1->type;
+                    tempData->val=$1->val % $3->val;
+                }else{
+                    yyerror("can't use the '%' operation");
+                }
+                $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<"\t\tirem\n";
             }
             |   expression '+' expression
             {
@@ -416,6 +512,10 @@ expression:     IDENTIFIER
                 {
                     tempData->type=$1->type;
                     tempData->val=$1->val + $3->val;
+                }if($1->type==INTEGER_type)
+                {
+                    tempData->type=$1->type;
+                    tempData->dval=$1->dval + $3->dval;
                 }else{
                     yyerror("can't use the '*' operation");
                 }
@@ -423,6 +523,8 @@ expression:     IDENTIFIER
                 $$ = tempData;
                 if($1->type == INTEGER_type)
                     out<<"\t\tiadd\n";
+                else if($1->type == REAL_type)
+                    out<<"\t\tdadd\n";
             }
             |   expression '-' expression
             {
@@ -432,13 +534,18 @@ expression:     IDENTIFIER
                 {
                     tempData->type=$1->type;
                     tempData->val=$1->val - $3->val;
+                }if($1->type==REAL_type)
+                {
+                    tempData->type=$1->type;
+                    tempData->dval=$1->dval - $3->dval;
                 }else{
                     yyerror("can't use the '-' operation");
                 }
-                // cout << "'-' successed!"<<endl;
                 $$ = tempData;
                 if($1->type == INTEGER_type)
                     out<<"\t\tisub\n";
+                if($1->type == REAL_type)
+                    out<<"\t\tdsub\n";
             }
             |   expression '<' expression
             {
@@ -448,8 +555,6 @@ expression:     IDENTIFIER
                 $$ = tempData;
 
                 out << "\t\tisub\n";
-                // int lb1 = lm.getLable();
-                // int lb2 = lm.getLable();
                 out << "\t\tiflt L"<< ++LabalCount << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<< ++LabalCount << "\n";
                 out << "\tL"<< ++NowCount << ":\n" << "\t\ticonst_1\n" << "\tL"<< ++NowCount << ":\n";
             }
@@ -460,9 +565,7 @@ expression:     IDENTIFIER
                 tempData->bval = ($1->val > $3->val);
                 $$ = tempData;
                 out << "\t\tisub\n";
-                // int lb1 = lm.getLable();
-                // int lb2 = lm.getLable();
-                out << "\t\tifgt L" << ++LabalCount << "\n" << "\t\ticonst_0\n" << "\t\tgoto L" << ++LabalCount << "\n";
+                out << "\t\tifgt L" << ++LabalCount << "\n"<< "\t\ticonst_0\n" << "\t\tgoto L"<< ++LabalCount << "\n";
                 out << "\tL"<< ++NowCount  << ":\n" << "\t\ticonst_1\n" << "\tL" << ++NowCount << ":\n";
             }
             |   expression '=' expression
@@ -472,8 +575,6 @@ expression:     IDENTIFIER
                 tempData->bval = ($1->val == $3->val);
                 $$ = tempData;
                 out << "\t\tisub\n";
-                // int lb1 = lm.getLable();
-                // int lb2 = lm.getLable();
                 out << "\t\tifeq L"<<++LabalCount  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount  << "\n";
                 out << "\tL"<<++NowCount  << ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount  << ":\n";
             }
@@ -484,8 +585,6 @@ expression:     IDENTIFIER
                 tempData->bval = ($1->val <= $3->val);
                 $$ = tempData;
                 out << "\t\tisub\n";
-                // int lb1 = lm.getLable();
-                // int lb2 = lm.getLable();
                 out << "\t\tifle L"<<++LabalCount  << "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount  << "\n";
                 out << "\tL"<<++NowCount  << ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount  << ":\n";
             }
@@ -496,8 +595,6 @@ expression:     IDENTIFIER
                 tempData->bval = ($1->val >= $3->val);
                 $$ = tempData;
                 out << "\t\tisub\n";
-                // int lb1 = lm.getLable();
-                // int lb2 = lm.getLable();
                 out << "\t\tifge L"<<++LabalCount <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount <<  "\n";
                 out << "\tL"<<++NowCount <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount <<  ":\n";
             }
@@ -508,8 +605,6 @@ expression:     IDENTIFIER
                 tempData->bval = ($1->bval != $3->bval);
                 $$ = tempData;
                 out << "\t\tisub\n";
-                // int lb1 = lm.getLable();
-                // int lb2 = lm.getLable();
                 out << "\t\tifne L"<<++LabalCount <<  "\n" << "\t\ticonst_0\n" << "\t\tgoto L"<<++LabalCount <<  "\n";
                 out << "\tL"<<++NowCount <<  ":\n" << "\t\ticonst_1\n" << "\tL"<<++NowCount <<  ":\n";
             }
@@ -529,7 +624,7 @@ expression:     IDENTIFIER
                 tempData->bval = ($1->bval && $3->bval);
                 $$ = tempData;
                 if($1->type == INTEGER_type)
-                    out<<"iand\n";
+                    out<<"\t\tiand\n";
             }
             |   expression OR expression
             {
@@ -538,7 +633,7 @@ expression:     IDENTIFIER
                 tempData->bval = ($1->bval || $3->bval);
                 $$ = tempData;
                 if($1->type == INTEGER_type)
-                    out<<"ior\n";
+                    out<<"\t\tior\n";
             }
             |   '(' expression ')'
             {
@@ -553,14 +648,20 @@ expression:     IDENTIFIER
             }
             ;
 
-conditional_statement:  IF '(' expression ')' THEN
+conditional_statement:  condition_title
+                         optional_statement END ';'
                         {
-                            out << "\t\tifeq L"<< ++LabalCount << "\n";
-                            SymbolTable tempData = stack.back();
-                            stack.push_back(tempData);
+                            cout << "if 1" <<endl;
+                            // out << "\nL" << lm.takeLabel(0) << ":\n";
+                            out << "\tL"<< ++NowCount << ":\n";
+                            stack.back().Dump();
+                            stack.pop_back();
                         }
+                        ;
+                        | condition_title
                          optional_statement 
                         {
+                            cout << "if 2" <<endl;
                             stack.back().Dump();
                             stack.pop_back();
                         }
@@ -578,29 +679,25 @@ conditional_statement:  IF '(' expression ')' THEN
                             stack.back().Dump();
                             stack.pop_back();
                         }
-                        |   IF '(' expression ')' THEN
+condition_title:    IF '(' expression ')' THEN
                         {
+                            cout << "if 2" <<endl;
                             out << "\t\tifeq L"<< ++LabalCount << "\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
-                         optional_statement END ';'
-                        {
-                            // out << "\nL" << lm.takeLabel(0) << ":\n";
-                            out << "\tL"<< ++NowCount << ":\n";
-                            stack.back().Dump();
-                            stack.pop_back();
-                        }
-                        ;
-
+                    ;
 
 loop_statement: WHILE '('
-                { out << "\n\tL"<< NowCount << ":\n";
-                  whilebegin=NowCount;
+                { 
+                    if(NowCount==0)
+                        out << "\n\tL"<< NowCount << ":\n";
+                    whilebegin=NowCount;
                 }
                 expression ')' DO
                 {
-                    out << "\t\tifeq L"<< ++LabalCount << "\n";	// ifeq Lexit
+                    // out << "\t\tifeq Lexit" << "\n";	// ifeq Lexit
+                    out << "\t\tifeq L"<< ++LabalCount << "\n";
                     SymbolTable tempData = stack.back();
                     stack.push_back(tempData);
                 }
@@ -609,7 +706,9 @@ loop_statement: WHILE '('
                     stack.back().Dump();
                     stack.pop_back();
                     out << "\t\tgoto L"<<whilebegin << "\n";		// goto Lbegin
-	                out << "\n\tL"<<++NowCount << ":\n";		// Lexit:
+	                // out << "\tLexit" << ":\n";		// Lexit:
+                    // out << "\t\tnop" << "\n";
+                    out << "\n\tL"<<++NowCount << ":\n";	
                 }
                 ;
 

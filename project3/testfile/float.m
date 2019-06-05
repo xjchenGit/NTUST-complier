@@ -6,3 +6,11 @@
 //    println ans;
 // }
 
+module FLO
+var a,b:real;
+begin
+   a:=1.1;
+   b:=2.1;
+   a:=a*b;
+   println a;
+end FLO.
