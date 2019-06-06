@@ -6,6 +6,7 @@ begin
    return a+b;
 end add;
 begin
+    println c;
     c:=add(a,10);
     if(c>10)then
         print -c;
