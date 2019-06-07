@@ -29,6 +29,10 @@ DataItem* lookupAllAddress(string s);
 int LabalCount=0;
 int NowCount=0;
 int whilebegin=0;
+int whileend=0;
+int ifbegin=0;
+int elsebegin=0;
+int Conelse=0;
 
 %}
 
@@ -55,12 +59,15 @@ int whilebegin=0;
 //%type <id_data> opt_IDENTIFIER
 %type <type> data_type opt_func_type
 /*precedence*/
-%left '*' '/'
-%left '+' '-'
-%left '<' LE_EQ '=' GR_EQ '>' NEQ
-%left '~'
-%left AND 
 %left OR
+%left AND 
+%left NEQ
+%left '<' '>' LE_EQ GR_EQ '=' EQ
+%left '+' '-'
+%left '*' '/' '%'
+%left '~'
+
+
 %nonassoc UMINUS
 
 %%
@@ -486,6 +493,26 @@ expression:     IDENTIFIER
 
                 delete tempData;
             }
+            |   expression AND expression
+            {
+                DataItem *tempData = new DataItem();
+                tempData->type = BOOLEAN_type;
+                tempData->bval = ($1->bval && $3->bval);
+                $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<"\t\tiand\n";
+                delete tempData;
+            }
+            |   expression OR expression
+            {
+                DataItem *tempData = new DataItem();
+                tempData->type = BOOLEAN_type;
+                tempData->bval = ($1->bval || $3->bval);
+                $$ = tempData;
+                if($1->type == INTEGER_type)
+                    out<<"\t\tior\n";
+                delete tempData;
+            }
             |   expression '/' expression
             {
                 if($1->type != $3->type) yyerror("left != right");
@@ -655,26 +682,6 @@ expression:     IDENTIFIER
                     out<<"ixor\n";
                 delete tempData;
             }
-            |   expression AND expression
-            {
-                DataItem *tempData = new DataItem();
-                tempData->type = BOOLEAN_type;
-                tempData->bval = ($1->bval && $3->bval);
-                $$ = tempData;
-                if($1->type == INTEGER_type)
-                    out<<"\t\tiand\n";
-                delete tempData;
-            }
-            |   expression OR expression
-            {
-                DataItem *tempData = new DataItem();
-                tempData->type = BOOLEAN_type;
-                tempData->bval = ($1->bval || $3->bval);
-                $$ = tempData;
-                if($1->type == INTEGER_type)
-                    out<<"\t\tior\n";
-                delete tempData;
-            }
             |   '(' expression ')'
             {
                 $$=$2;
@@ -692,9 +699,10 @@ expression:     IDENTIFIER
 conditional_statement:  condition_title
                          optional_statement END ';'
                         {
-                            out << "\tL"<< ++NowCount << ":\n";
+                            out << "\tL"<< ifbegin << ":\n";
                             stack.back().Dump();
                             stack.pop_back();
+                            ifbegin = 0;
                         }
                         ;
                         | condition_title
@@ -705,22 +713,30 @@ conditional_statement:  condition_title
                         }
                          ELSE 
                         {
-                            out << "\t\tgoto L"<< ++LabalCount << "\n";
-	                        out << "\tL"<< ++NowCount << ":\n";
+                            Conelse = 1; 
+                            elsebegin = ++LabalCount;
+                            NowCount = ++NowCount;
+                            out << "\t\tgoto L"<< elsebegin << "\n";
+	                        out << "\tL"<< ifbegin << ":\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
                          optional_statement 
                          END ';'
                         {
-                            out << "\tL"<< ++NowCount << ":\n";
+                            out << "\tL"<< elsebegin << ":\n";
                             stack.back().Dump();
                             stack.pop_back();
+                            ifbegin=0;
+                            elsebegin=0;
+                            Conelse=0;
                         }
                         ;
 condition_title:    IF '(' expression ')' THEN
                         {
-                            out << "\t\tifeq L"<< ++LabalCount << "\n";
+                            ifbegin = ++LabalCount;
+                            NowCount = ++NowCount;
+                            out << "\t\tifeq L"<< ifbegin << "\n";
                             SymbolTable tempData = stack.back();
                             stack.push_back(tempData);
                         }
@@ -728,14 +744,22 @@ condition_title:    IF '(' expression ')' THEN
 
 loop_statement: WHILE '('
                 { 
-                    if(NowCount==0)
+                    if(NowCount==0){
                         out << "\n\tL"<< NowCount << ":\n";
-                    whilebegin=NowCount;
+                        whilebegin = NowCount;
+                    }else if(Conelse==1){
+                        whilebegin=NowCount-1;
+                    }else{
+                        whilebegin=NowCount;
+                    }
                 }
                 expression ')' DO
                 {
-                    out << "\t\tifeq L"<< ++LabalCount << "\n";  // ifeq Lexit
+                    whileend=++LabalCount;
+                    NowCount=++NowCount;
+                    out << "\t\tifeq L"<< whileend << "\n";  // ifeq Lexit
                     SymbolTable tempData = stack.back();
+
                     stack.push_back(tempData);
                 }
                 optional_statement END ';'
@@ -743,7 +767,10 @@ loop_statement: WHILE '('
                     stack.back().Dump();
                     stack.pop_back();
                     out << "\t\tgoto L"<<whilebegin << "\n";		// goto Lbegin
-                    out << "\n\tL"<<++NowCount << ":\n";	// Lexit:
+                    out << "\n\tL"<< whileend << ":";	// Lexit:
+                    out << "\n\t\tnop" << "\n";
+                    whilebegin=0;
+                    whileend=0;
                 }
                 ;
 
