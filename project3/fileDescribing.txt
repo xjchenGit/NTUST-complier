@@ -1,0 +1,4 @@
+1、把不需要用到的READ statement\array的声明去掉
+2、有实作floating-point num和string variables。
+3、在.y文檔裡面寫javabytecode。
+4、.y文档用c++的fstream輸出javabytecode到.jasm文檔。

@@ -66,6 +66,8 @@ int Conelse=0;
 %left '+' '-'
 %left '*' '/' '%'
 %left '~'
+
+
 %nonassoc UMINUS
 
 %%
@@ -87,7 +89,7 @@ program:    MODULE IDENTIFIER
                 out  << "\tmethod public static void main(java.lang.String[])\n" << "\tmax_stack 15\n" << "\tmax_locals 15\n\t{\n";
                 
             }
-             _BEGIN  
+             _BEGIN 
              {
                 SymbolTable tempData;
                 stack.push_back(tempData);
@@ -137,11 +139,13 @@ Procedure_dec:  PROCEDURE IDENTIFIER
                         if(i!=0) out << ",";
                         out << "int";
                     }
+                    cout << "test module1"<<endl;
                     out << ")\n" << "\tmax_stack 15\n" << "\tmax_locals 15\n\t{\n";
                     args_num=0;
                     DataItem* func_id = stack[0].lookupAddress(funcname);
                     func_id->type=$5;
                     stack[0].Dump();
+                    cout << "test module2"<<endl;
                 }
                 pro_dec2 IDENTIFIER ';'
                 {
